@@ -6,13 +6,15 @@ services:
     hostname: ack
     ports:
       - 3000:3000
+    expose:
+      - 3000
     networks:
       - app-network
     volumes:
       - ./src/:/app/src/
       - .env/:/app/.env
     restart: unless-stopped
-    depends_on: 
+    depends_on:
       - mongodb
   mongodb:
     image: mongo:latest
@@ -20,6 +22,8 @@ services:
     hostname: mongo
     ports:
       - 27017:27017
+    expose:
+      - 27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456
