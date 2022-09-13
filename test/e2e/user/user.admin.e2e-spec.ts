@@ -1,8 +1,8 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import {HttpStatus, INestApplication} from '@nestjs/common';
+import {Test} from '@nestjs/testing';
 import request from 'supertest';
-import { faker } from '@faker-js/faker';
-import { Types, connection } from 'mongoose';
+import {faker} from '@faker-js/faker';
+import {connection, Types} from 'mongoose';
 import {
     E2E_USER_ADMIN_ACTIVE_URL,
     E2E_USER_ADMIN_CREATE_URL,
@@ -12,23 +12,23 @@ import {
     E2E_USER_ADMIN_LIST_URL,
     E2E_USER_ADMIN_UPDATE_URL,
 } from './user.constant';
-import { RouterModule } from '@nestjs/core';
-import { useContainer } from 'class-validator';
-import { UserService } from 'src/modules/user/services/user.service';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { RoleService } from 'src/modules/role/services/role.service';
-import { HelperDateService } from 'src/common/helper/services/helper.date.service';
-import { AuthApiService } from 'src/common/auth/services/auth.api.service';
-import { UserDocument } from 'src/modules/user/schemas/user.schema';
-import { CommonModule } from 'src/common/common.module';
-import { RoutesAdminModule } from 'src/router/routes/routes.admin.module';
-import { RoleDocument } from 'src/modules/role/schemas/role.schema';
-import { IUserDocument } from 'src/modules/user/user.interface';
-import { plainToInstance } from 'class-transformer';
-import { ENUM_REQUEST_STATUS_CODE_ERROR } from 'src/common/request/constants/request.status-code.constant';
-import { ENUM_ROLE_STATUS_CODE_ERROR } from 'src/modules/role/constants/role.status-code.constant';
-import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/constants/user.status-code.constant';
-import { UserPayloadSerialization } from 'src/modules/user/serializations/user.payload.serialization';
+import {RouterModule} from '@nestjs/core';
+import {useContainer} from 'class-validator';
+import {UserService} from 'src/modules/user/services/user.service';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {RoleService} from 'src/modules/role/services/role.service';
+import {HelperDateService} from 'src/common/helper/services/helper.date.service';
+import {AuthApiService} from 'src/common/auth/services/auth.api.service';
+import {UserDocument} from 'src/modules/user/schemas/user.schema';
+import {CommonModule} from 'src/common/common.module';
+import {RoutesAdminModule} from 'src/router/routes/routes.admin.module';
+import {RoleDocument} from 'src/modules/role/schemas/role.schema';
+import {IUserDocument} from 'src/modules/user/user.interface';
+import {plainToInstance} from 'class-transformer';
+import {ENUM_REQUEST_STATUS_CODE_ERROR} from 'src/common/request/constants/request.status-code.constant';
+import {ENUM_ROLE_STATUS_CODE_ERROR} from 'src/modules/role/constants/role.status-code.constant';
+import {ENUM_USER_STATUS_CODE_ERROR} from 'src/modules/user/constants/user.status-code.constant';
+import {UserPayloadSerialization} from 'src/modules/user/serializations/user.payload.serialization';
 
 describe('E2E User Admin', () => {
     let app: INestApplication;
@@ -40,7 +40,7 @@ describe('E2E User Admin', () => {
 
     const password = `@!${faker.name.firstName().toLowerCase()}${faker.name
         .firstName()
-        .toUpperCase()}${faker.datatype.number({ min: 1, max: 99 })}`;
+        .toUpperCase()}${faker.datatype.number({min: 1, max: 99})}`;
 
     const apiKey = 'qwertyuiop12345zxcvbnmkjh';
     let xApiKey: string;
@@ -66,7 +66,7 @@ describe('E2E User Admin', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
         userService = app.get(UserService);
         authService = app.get(AuthService);
         roleService = app.get(RoleService);
@@ -82,8 +82,9 @@ describe('E2E User Admin', () => {
             lastName: faker.name.lastName(),
             password: password,
             email: faker.internet.email(),
-            mobileNumber: faker.phone.number('62812#########'),
+            mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
+            userAuthKey: "NON",
         };
 
         const passwordHash = await authService.createPassword(
@@ -97,8 +98,9 @@ describe('E2E User Admin', () => {
             passwordExpired: passwordHash.passwordExpired,
             salt: passwordHash.salt,
             email: faker.internet.email(),
-            mobileNumber: faker.phone.number('62812#########'),
+            mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
+            userAuthKey: faker.random.word(),
         });
 
         const user = await userService.findOne<IUserDocument>(
@@ -523,7 +525,7 @@ describe('E2E User Admin', () => {
             console.error(e);
         }
 
-        connection.close();
+        await connection.close();
         await app.close();
     });
 });

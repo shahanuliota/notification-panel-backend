@@ -1,25 +1,25 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import {HttpStatus, INestApplication} from '@nestjs/common';
+import {Test} from '@nestjs/testing';
 import request from 'supertest';
-import { faker } from '@faker-js/faker';
-import { Types, connection } from 'mongoose';
-import { RouterModule } from '@nestjs/core';
-import { useContainer } from 'class-validator';
-import { UserService } from 'src/modules/user/services/user.service';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { RoleService } from 'src/modules/role/services/role.service';
-import { HelperDateService } from 'src/common/helper/services/helper.date.service';
-import { AuthApiService } from 'src/common/auth/services/auth.api.service';
-import { UserDocument } from 'src/modules/user/schemas/user.schema';
-import { CommonModule } from 'src/common/common.module';
-import { RoutesModule } from 'src/router/routes/routes.module';
-import { RoleDocument } from 'src/modules/role/schemas/role.schema';
-import { IUserDocument } from 'src/modules/user/user.interface';
-import { plainToInstance } from 'class-transformer';
-import { UserPayloadSerialization } from 'src/modules/user/serializations/user.payload.serialization';
-import { E2E_USER_REFRESH_URL } from './user.constant';
-import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/constants/user.status-code.constant';
-import { ENUM_ROLE_STATUS_CODE_ERROR } from 'src/modules/role/constants/role.status-code.constant';
+import {faker} from '@faker-js/faker';
+import {connection, Types} from 'mongoose';
+import {RouterModule} from '@nestjs/core';
+import {useContainer} from 'class-validator';
+import {UserService} from 'src/modules/user/services/user.service';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {RoleService} from 'src/modules/role/services/role.service';
+import {HelperDateService} from 'src/common/helper/services/helper.date.service';
+import {AuthApiService} from 'src/common/auth/services/auth.api.service';
+import {UserDocument} from 'src/modules/user/schemas/user.schema';
+import {CommonModule} from 'src/common/common.module';
+import {RoutesModule} from 'src/router/routes/routes.module';
+import {RoleDocument} from 'src/modules/role/schemas/role.schema';
+import {IUserDocument} from 'src/modules/user/user.interface';
+import {plainToInstance} from 'class-transformer';
+import {UserPayloadSerialization} from 'src/modules/user/serializations/user.payload.serialization';
+import {E2E_USER_REFRESH_URL} from './user.constant';
+import {ENUM_USER_STATUS_CODE_ERROR} from 'src/modules/user/constants/user.status-code.constant';
+import {ENUM_ROLE_STATUS_CODE_ERROR} from 'src/modules/role/constants/role.status-code.constant';
 
 describe('E2E User Refresh', () => {
     let app: INestApplication;
@@ -31,7 +31,7 @@ describe('E2E User Refresh', () => {
 
     const password = `@!${faker.name.firstName().toLowerCase()}${faker.name
         .firstName()
-        .toUpperCase()}${faker.datatype.number({ min: 1, max: 99 })}`;
+        .toUpperCase()}${faker.datatype.number({min: 1, max: 99})}`;
 
     const apiKey = 'qwertyuiop12345zxcvbnmkjh';
     let xApiKey: string;
@@ -59,7 +59,7 @@ describe('E2E User Refresh', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
         userService = app.get(UserService);
         authService = app.get(AuthService);
         roleService = app.get(RoleService);
@@ -82,8 +82,9 @@ describe('E2E User Refresh', () => {
             passwordExpired: passwordHash.passwordExpired,
             salt: passwordHash.salt,
             email: faker.internet.email(),
-            mobileNumber: faker.phone.number('62812#########'),
+            mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
+            userAuthKey: faker.random.word(),
         });
 
         const userPopulate = await userService.findOneById<IUserDocument>(

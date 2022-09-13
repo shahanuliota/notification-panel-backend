@@ -12,39 +12,33 @@ import {
     Post,
     UploadedFile,
 } from '@nestjs/common';
-import { Token, User } from 'src/common/auth/decorators/auth.decorator';
-import {
-    AuthJwtGuard,
-    AuthRefreshJwtGuard,
-} from 'src/common/auth/decorators/auth.jwt.decorator';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { IAwsS3 } from 'src/common/aws/aws.interface';
-import { AwsS3Service } from 'src/common/aws/services/aws.s3.service';
-import { ENUM_ERROR_STATUS_CODE_ERROR } from 'src/common/error/constants/error.status-code.constant';
-import { UploadFileSingle } from 'src/common/file/decorators/file.decorator';
-import { IFile } from 'src/common/file/file.interface';
-import { FileRequiredPipe } from 'src/common/file/pipes/file.required.pipe';
-import { FileSizeImagePipe } from 'src/common/file/pipes/file.size.pipe';
-import { FileTypeImagePipe } from 'src/common/file/pipes/file.type.pipe';
-import { ENUM_LOGGER_ACTION } from 'src/common/logger/constants/logger.enum.constant';
-import { Logger } from 'src/common/logger/decorators/logger.decorator';
-import { Response } from 'src/common/response/decorators/response.decorator';
-import { IResponse } from 'src/common/response/response.interface';
-import { ENUM_ROLE_STATUS_CODE_ERROR } from 'src/modules/role/constants/role.status-code.constant';
-import {
-    ENUM_USER_STATUS_CODE_ERROR,
-    ENUM_USER_STATUS_CODE_SUCCESS,
-} from '../constants/user.status-code.constant';
-import { GetUser } from '../decorators/user.decorator';
-import { UserProfileGuard } from '../decorators/user.public.decorator';
-import { UserChangePasswordDto } from '../dtos/user.change-password.dto';
-import { UserLoginDto } from '../dtos/user.login.dto';
-import { UserDocument } from '../schemas/user.schema';
-import { UserLoginSerialization } from '../serializations/user.login.serialization';
-import { UserPayloadSerialization } from '../serializations/user.payload.serialization';
-import { UserProfileSerialization } from '../serializations/user.profile.serialization';
-import { UserService } from '../services/user.service';
-import { IUserDocument } from '../user.interface';
+import {Token, User} from 'src/common/auth/decorators/auth.decorator';
+import {AuthJwtGuard, AuthRefreshJwtGuard,} from 'src/common/auth/decorators/auth.jwt.decorator';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {IAwsS3} from 'src/common/aws/aws.interface';
+import {AwsS3Service} from 'src/common/aws/services/aws.s3.service';
+import {ENUM_ERROR_STATUS_CODE_ERROR} from 'src/common/error/constants/error.status-code.constant';
+import {UploadFileSingle} from 'src/common/file/decorators/file.decorator';
+import {IFile} from 'src/common/file/file.interface';
+import {FileRequiredPipe} from 'src/common/file/pipes/file.required.pipe';
+import {FileSizeImagePipe} from 'src/common/file/pipes/file.size.pipe';
+import {FileTypeImagePipe} from 'src/common/file/pipes/file.type.pipe';
+import {ENUM_LOGGER_ACTION} from 'src/common/logger/constants/logger.enum.constant';
+import {Logger} from 'src/common/logger/decorators/logger.decorator';
+import {Response} from 'src/common/response/decorators/response.decorator';
+import {IResponse} from 'src/common/response/response.interface';
+import {ENUM_ROLE_STATUS_CODE_ERROR} from 'src/modules/role/constants/role.status-code.constant';
+import {ENUM_USER_STATUS_CODE_ERROR, ENUM_USER_STATUS_CODE_SUCCESS,} from '../constants/user.status-code.constant';
+import {GetUser} from '../decorators/user.decorator';
+import {UserProfileGuard} from '../decorators/user.public.decorator';
+import {UserChangePasswordDto} from '../dtos/user.change-password.dto';
+import {UserLoginDto} from '../dtos/user.login.dto';
+import {UserDocument} from '../schemas/user.schema';
+import {UserLoginSerialization} from '../serializations/user.login.serialization';
+import {UserPayloadSerialization} from '../serializations/user.payload.serialization';
+import {UserProfileSerialization} from '../serializations/user.profile.serialization';
+import {UserService} from '../services/user.service';
+import {IUserDocument} from '../user.interface';
 
 @Controller({
     version: '1',
@@ -55,7 +49,8 @@ export class UserController {
         private readonly authService: AuthService,
         private readonly userService: UserService,
         private readonly awsService: AwsS3Service
-    ) {}
+    ) {
+    }
 
     @Response('user.profile', {
         classSerialization: UserProfileSerialization,
@@ -76,7 +71,7 @@ export class UserController {
     async upload(
         @GetUser() user: IUserDocument,
         @UploadedFile(FileRequiredPipe, FileSizeImagePipe, FileTypeImagePipe)
-        file: IFile
+            file: IFile
     ): Promise<void> {
         const filename: string = file.originalname;
         const content: Buffer = file.buffer;
@@ -129,7 +124,7 @@ export class UserController {
         if (!matchPassword) {
             throw new BadRequestException({
                 statusCode:
-                    ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NOT_MATCH_ERROR,
+                ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NOT_MATCH_ERROR,
                 message: 'user.error.passwordNotMatch',
             });
         }
@@ -141,7 +136,7 @@ export class UserController {
         if (newMatchPassword) {
             throw new BadRequestException({
                 statusCode:
-                    ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NEW_MUST_DIFFERENCE_ERROR,
+                ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NEW_MUST_DIFFERENCE_ERROR,
                 message: 'user.error.newPasswordMustDifference',
             });
         }
@@ -163,8 +158,8 @@ export class UserController {
         return;
     }
 
-    @Response('user.login', { classSerialization: UserLoginSerialization })
-    @Logger(ENUM_LOGGER_ACTION.LOGIN, { tags: ['login', 'withEmail'] })
+    @Response('user.login', {classSerialization: UserLoginSerialization})
+    @Logger(ENUM_LOGGER_ACTION.LOGIN, {tags: ['login', 'withEmail']})
     @HttpCode(HttpStatus.OK)
     @Post('/login')
     async login(@Body() body: UserLoginDto): Promise<IResponse> {
@@ -196,7 +191,7 @@ export class UserController {
         if (!validate) {
             throw new BadRequestException({
                 statusCode:
-                    ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NOT_MATCH_ERROR,
+                ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_NOT_MATCH_ERROR,
                 message: 'user.error.passwordNotMatch',
             });
         } else if (!user.isActive) {
@@ -216,7 +211,7 @@ export class UserController {
         const tokenType: string = await this.authService.getTokenType();
         const expiresIn: number =
             await this.authService.getAccessTokenExpirationTime();
-        const rememberMe: boolean = body.rememberMe ? true : false;
+        const rememberMe: boolean = body.rememberMe;
         const payloadAccessToken: Record<string, any> =
             await this.authService.createPayloadAccessToken(
                 payload,
@@ -237,7 +232,7 @@ export class UserController {
 
         const refreshToken: string = await this.authService.createRefreshToken(
             payloadRefreshToken,
-            { rememberMe }
+            {rememberMe}
         );
 
         const checkPasswordExpired: boolean =
@@ -248,7 +243,7 @@ export class UserController {
                 metadata: {
                     // override status code and message
                     statusCode:
-                        ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_EXPIRED_ERROR,
+                    ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_EXPIRED_ERROR,
                     message: 'user.error.passwordExpired',
                 },
                 tokenType,
@@ -257,6 +252,7 @@ export class UserController {
                 refreshToken,
             };
         }
+        const userAuthKey = user.userAuthKey;
 
         return {
             metadata: {
@@ -267,6 +263,7 @@ export class UserController {
             expiresIn,
             accessToken,
             refreshToken,
+            userAuthKey,
         };
     }
 
@@ -276,7 +273,7 @@ export class UserController {
     @Post('/refresh')
     async refresh(
         @User()
-        { _id, rememberMe, loginDate }: Record<string, any>,
+            {_id, rememberMe, loginDate}: Record<string, any>,
         @Token() refreshToken: string
     ): Promise<IResponse> {
         const user: IUserDocument =
@@ -288,6 +285,7 @@ export class UserController {
             });
 
         if (!user) {
+
             throw new NotFoundException({
                 statusCode: ENUM_USER_STATUS_CODE_ERROR.USER_NOT_FOUND_ERROR,
                 message: 'user.error.notFound',
@@ -304,13 +302,14 @@ export class UserController {
             });
         }
 
+
         const checkPasswordExpired: boolean =
             await this.authService.checkPasswordExpired(user.passwordExpired);
 
         if (checkPasswordExpired) {
             throw new ForbiddenException({
                 statusCode:
-                    ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_EXPIRED_ERROR,
+                ENUM_USER_STATUS_CODE_ERROR.USER_PASSWORD_EXPIRED_ERROR,
                 message: 'user.error.passwordExpired',
             });
         }
