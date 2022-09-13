@@ -1,9 +1,9 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types, Document } from 'mongoose';
-import { IAwsS3 } from 'src/common/aws/aws.interface';
-import { RoleEntity } from 'src/modules/role/schemas/role.schema';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import {Document, Types} from 'mongoose';
+import {IAwsS3} from 'src/common/aws/aws.interface';
+import {RoleEntity} from 'src/modules/role/schemas/role.schema';
 
-@Schema({ timestamps: true, versionKey: false })
+@Schema({timestamps: true, versionKey: false})
 export class UserEntity {
     @Prop({
         required: true,
@@ -59,6 +59,11 @@ export class UserEntity {
         required: true,
     })
     salt: string;
+
+    @Prop({
+        required: true,
+    })
+    userAuthKey: string;
 
     @Prop({
         required: true,

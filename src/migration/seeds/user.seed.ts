@@ -1,10 +1,10 @@
-import { Command } from 'nestjs-command';
-import { Injectable } from '@nestjs/common';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { UserService } from 'src/modules/user/services/user.service';
-import { UserBulkService } from 'src/modules/user/services/user.bulk.service';
-import { RoleService } from 'src/modules/role/services/role.service';
-import { RoleDocument } from 'src/modules/role/schemas/role.schema';
+import {Command} from 'nestjs-command';
+import {Injectable} from '@nestjs/common';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {UserService} from 'src/modules/user/services/user.service';
+import {UserBulkService} from 'src/modules/user/services/user.bulk.service';
+import {RoleService} from 'src/modules/role/services/role.service';
+import {RoleDocument} from 'src/modules/role/schemas/role.schema';
 
 @Injectable()
 export class UserSeed {
@@ -13,7 +13,8 @@ export class UserSeed {
         private readonly userService: UserService,
         private readonly userBulkService: UserBulkService,
         private readonly roleService: RoleService
-    ) {}
+    ) {
+    }
 
     @Command({
         command: 'insert:user',
@@ -47,6 +48,7 @@ export class UserSeed {
                 mobileNumber: '08111111222',
                 role: superadminRole._id,
                 salt: password.salt,
+                userAuthKey: "NON",
             });
 
             await this.userService.create({
@@ -58,6 +60,7 @@ export class UserSeed {
                 mobileNumber: '08111111111',
                 role: adminRole._id,
                 salt: password.salt,
+                userAuthKey: "NON",
             });
 
             await this.userService.create({
@@ -69,6 +72,7 @@ export class UserSeed {
                 mobileNumber: '08111111333',
                 role: userRole._id,
                 salt: password.salt,
+                userAuthKey: "NON",
             });
         } catch (err: any) {
             throw new Error(err.message);

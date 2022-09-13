@@ -6,18 +6,18 @@ import {
     NotFoundException,
     Post,
 } from '@nestjs/common';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { ENUM_ERROR_STATUS_CODE_ERROR } from 'src/common/error/constants/error.status-code.constant';
-import { Response } from 'src/common/response/decorators/response.decorator';
-import { IResponse } from 'src/common/response/response.interface';
-import { ENUM_ROLE_STATUS_CODE_ERROR } from 'src/modules/role/constants/role.status-code.constant';
-import { RoleDocument } from 'src/modules/role/schemas/role.schema';
-import { RoleService } from 'src/modules/role/services/role.service';
-import { ENUM_USER_STATUS_CODE_ERROR } from '../constants/user.status-code.constant';
-import { UserSignUpDto } from '../dtos/user.sign-up.dto';
-import { UserPayloadSerialization } from '../serializations/user.payload.serialization';
-import { UserService } from '../services/user.service';
-import { IUserCheckExist, IUserDocument } from '../user.interface';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {ENUM_ERROR_STATUS_CODE_ERROR} from 'src/common/error/constants/error.status-code.constant';
+import {Response} from 'src/common/response/decorators/response.decorator';
+import {IResponse} from 'src/common/response/response.interface';
+import {ENUM_ROLE_STATUS_CODE_ERROR} from 'src/modules/role/constants/role.status-code.constant';
+import {RoleDocument} from 'src/modules/role/schemas/role.schema';
+import {RoleService} from 'src/modules/role/services/role.service';
+import {ENUM_USER_STATUS_CODE_ERROR} from '../constants/user.status-code.constant';
+import {UserSignUpDto} from '../dtos/user.sign-up.dto';
+import {UserPayloadSerialization} from '../serializations/user.payload.serialization';
+import {UserService} from '../services/user.service';
+import {IUserCheckExist, IUserDocument} from '../user.interface';
 
 @Controller({
     version: '1',
@@ -28,13 +28,14 @@ export class UserPublicController {
         private readonly userService: UserService,
         private readonly authService: AuthService,
         private readonly roleService: RoleService
-    ) {}
+    ) {
+    }
 
     @Response('auth.signUp')
     @Post('/sign-up')
     async signUp(
         @Body()
-        { email, mobileNumber, ...body }: UserSignUpDto
+            {email, mobileNumber, ...body}: UserSignUpDto
     ): Promise<IResponse> {
         const role: RoleDocument = await this.roleService.findOne<RoleDocument>(
             {
@@ -66,7 +67,7 @@ export class UserPublicController {
         } else if (checkExist.mobileNumber) {
             throw new BadRequestException({
                 statusCode:
-                    ENUM_USER_STATUS_CODE_ERROR.USER_MOBILE_NUMBER_EXIST_ERROR,
+                ENUM_USER_STATUS_CODE_ERROR.USER_MOBILE_NUMBER_EXIST_ERROR,
                 message: 'user.error.mobileNumberExist',
             });
         }
@@ -85,6 +86,7 @@ export class UserPublicController {
                 password: password.passwordHash,
                 passwordExpired: password.passwordExpired,
                 salt: password.salt,
+                userAuthKey: body.userAuthKey,
             });
 
             const user: IUserDocument =

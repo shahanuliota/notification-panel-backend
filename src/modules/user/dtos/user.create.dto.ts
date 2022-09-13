@@ -1,14 +1,7 @@
-import { Type } from 'class-transformer';
-import {
-    IsString,
-    IsNotEmpty,
-    IsEmail,
-    MaxLength,
-    MinLength,
-    IsMongoId,
-} from 'class-validator';
-import { IsPasswordStrong } from 'src/common/request/validations/request.is-password-strong.validation';
-import { IsStartWith } from 'src/common/request/validations/request.is-start-with.validation';
+import {Type} from 'class-transformer';
+import {IsEmail, IsMongoId, IsNotEmpty, IsString, MaxLength, MinLength,} from 'class-validator';
+import {IsPasswordStrong} from 'src/common/request/validations/request.is-password-strong.validation';
+import {IsStartWith} from 'src/common/request/validations/request.is-start-with.validation';
 
 export class UserCreateDto {
     @IsEmail()
@@ -46,4 +39,7 @@ export class UserCreateDto {
     @IsNotEmpty()
     @IsPasswordStrong()
     readonly password: string;
+
+    @IsNotEmpty()
+    readonly userAuthKey: string;
 }
