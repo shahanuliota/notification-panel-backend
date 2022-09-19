@@ -7,6 +7,7 @@ import {IResponse} from "../../../common/response/response.interface";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {GroupService} from "../services/group.service";
+import {Response} from "../../../common/response/decorators/response.decorator";
 
 
 @Controller({
@@ -26,7 +27,7 @@ export class AppGroutController {
         return 'hello';
     }
 
-
+    @Response('group.create')
     @UserProfileGuard()
     @AuthJwtGuard()
     @Post('/create')
