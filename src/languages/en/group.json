@@ -7,6 +7,7 @@
   "inactive": "Group inactive succeed",
   "error": {
     "notFound": "Group not found",
-    "active": "Group active status invalid"
+    "active": "Group active status invalid",
+    "exist": "Group already exist"
   }
 }
