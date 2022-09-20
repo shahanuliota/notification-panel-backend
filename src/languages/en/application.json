@@ -1,0 +1,13 @@
+{
+  "list": "Application list succeed",
+  "get": "Application get succeed",
+  "create": "Application creation succeed",
+  "update": "Application update succeed",
+  "active": "Application active succeed",
+  "inactive": "Application inactive succeed",
+  "error": {
+    "notFound": "Application not found",
+    "active": "Application active status invalid",
+    "exist": "Application already exist"
+  }
+}

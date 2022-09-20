@@ -1,0 +1,13 @@
+{
+  "list": "Group list succeed",
+  "get": "Group get succeed",
+  "create": "Group creation succeed",
+  "update": "Group update succeed",
+  "active": "Group active succeed",
+  "inactive": "Group inactive succeed",
+  "error": {
+    "notFound": "Group not found",
+    "active": "Group active status invalid",
+    "exist": "Group already exist"
+  }
+}

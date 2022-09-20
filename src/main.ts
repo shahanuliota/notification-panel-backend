@@ -74,6 +74,27 @@ async function bootstrap() {
     logger.log(`Server running on ${await app.getUrl()}`, 'NestApplication');
 
     logger.log(`==========================================================`);
+    routeListMethod(app);
 }
 
 bootstrap();
+const routeListMethod = (app: NestApplication) => {
+    const server = app.getHttpServer();
+    const router = server._events.request._router;
+    const availableRoutes: [] = router.stack
+        .map((layer) => {
+            if (layer.route) {
+                return {
+                    route: {
+                        path: layer.route?.path,
+                        method: layer.route?.stack[0].method,
+                    },
+                };
+            }
+        })
+        .filter((item) => item !== undefined);
+    availableRoutes.forEach((e) => console.log(e['route']));
+    // logger.log(availableRoutes);
+
+    console.log('TOTAL ROUTE => ', availableRoutes.length);
+};
