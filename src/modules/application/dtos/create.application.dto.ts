@@ -6,9 +6,6 @@ export class CreateApplicationDto {
     @IsNotEmpty()
     readonly name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    readonly owner: string;
 
     @IsNotEmpty()
     @IsNumber()

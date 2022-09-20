@@ -50,7 +50,6 @@ export class ApplicationEntity {
     application_id: string;
 
     @Prop({
-        required: true,
         default: ""
     })
     gcm_key: string;
