@@ -9,6 +9,8 @@ import {UserAdminController} from 'src/modules/user/controllers/user.admin.contr
 import {UserModule} from 'src/modules/user/user.module';
 import {GroupModule} from "../../modules/group/group.module";
 import {AppGroutController} from "../../modules/group/controllers/group.controller";
+import {ApplicationModule} from "../../modules/application/application.module";
+import {ApplicationController} from "../../modules/application/controllers/application.controller";
 
 @Module({
     controllers: [
@@ -16,11 +18,12 @@ import {AppGroutController} from "../../modules/group/controllers/group.controll
         UserAdminController,
         RoleAdminController,
         PermissionAdminController,
-        AppGroutController
+        AppGroutController,
+        ApplicationController
     ],
     providers: [],
     exports: [],
-    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule],
+    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule, ApplicationModule],
 })
 export class RoutesAdminModule {
 }

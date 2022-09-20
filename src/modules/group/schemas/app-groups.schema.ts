@@ -10,7 +10,6 @@ export class AppGroupEntity {
         uppercase: true,
         // unique: true,
         trim: true,
-
     })
     name: string;
 
