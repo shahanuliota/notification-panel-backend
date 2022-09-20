@@ -6,10 +6,11 @@ import {UserEntity} from "../../user/schemas/user.schema";
 export class AppGroupEntity {
     @Prop({
         required: true,
-        index: true,
+        // index: true,
         uppercase: true,
-        unique: true,
+        // unique: true,
         trim: true,
+
     })
     name: string;
 
@@ -17,7 +18,6 @@ export class AppGroupEntity {
         required: true,
         type: Types.ObjectId,
         ref: UserEntity.name,
-
     })
     owner: Types.ObjectId;
 
