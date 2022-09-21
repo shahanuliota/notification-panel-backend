@@ -2,7 +2,7 @@
 
 docker run -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123456 -p 27017:27017 mongo
 
-	docker run -p 3000:3000 --network="host" -e APP_NAME=notification-panel\
+	docker run -p 3000:3000  -e APP_NAME=notification-panel\
                              -e APP_ENV=development\
                              -e APP_MODE=simple\
                              -e APP_LANGUAGE=en\
@@ -14,12 +14,12 @@ docker run -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=1234
                              -e APP_VERSION=1\
                              -e APP_HTTP_ON=true\
                              -e APP_JOB_ON=true\
-                          	 -e DATABASE_HOST=mongodb://mongodb:27017\
+                          	 -e DATABASE_HOST=mongodb+srv://cluster0.nkjzpcx.mongodb.net\
                              -e DATABASE_NAME=notification_panel\
-                             -e DATABASE_USER=root\
-                             -e DATABASE_PASSWORD=123456\
+                             -e DATABASE_USER=iotait\
+                             -e DATABASE_PASSWORD=ddz5vPPwbvzCHwE\
                              -e DATABASE_DEBUG=false\
-                             -e DATABASE_OPTIONS=authSource=admin\
+                             -e DATABASE_OPTIONS=retryWrites=true&w=majority\
                              -e MIDDLEWARE_TOLERANCE_TIMESTAMP=5m\
                              -e MIDDLEWARE_TIMEOUT=30s\
                              -e AUTH_JWT_AUDIENCE=https://iotait.com\
