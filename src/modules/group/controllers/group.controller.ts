@@ -47,12 +47,7 @@ export class AppGroutController {
         }
         try {
             const data: AppGroupDocument = await this.groupServices.create(dto, user);
-            return {
-                'id': data._id,
-                name: data.name,
-                description: data.description,
-                owner: data.owner,
-            };
+            return data['_doc'];
         } catch (err) {
             throw new InternalServerErrorException({
                 statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
