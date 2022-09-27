@@ -94,7 +94,5 @@ const routeListMethod = (app: NestApplication) => {
         })
         .filter((item) => item !== undefined);
     availableRoutes.forEach((e) => console.log(e['route']));
-    // logger.log(availableRoutes);
-
     console.log('TOTAL ROUTE => ', availableRoutes.length);
 };

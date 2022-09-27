@@ -32,13 +32,13 @@ import {ENUM_USER_STATUS_CODE_ERROR, ENUM_USER_STATUS_CODE_SUCCESS,} from '../co
 import {GetUser} from '../decorators/user.decorator';
 import {UserProfileGuard} from '../decorators/user.public.decorator';
 import {UserChangePasswordDto} from '../dtos/user.change-password.dto';
-import {UserLoginDto} from '../dtos/user.login.dto';
 import {UserDocument} from '../schemas/user.schema';
 import {UserLoginSerialization} from '../serializations/user.login.serialization';
 import {UserPayloadSerialization} from '../serializations/user.payload.serialization';
 import {UserProfileSerialization} from '../serializations/user.profile.serialization';
 import {UserService} from '../services/user.service';
 import {IUserDocument} from '../user.interface';
+import {UserLoginDto} from "../dtos/user.login.dto";
 
 @Controller({
     version: '1',
@@ -162,6 +162,7 @@ export class UserController {
     @Logger(ENUM_LOGGER_ACTION.LOGIN, {tags: ['login', 'withEmail']})
     @HttpCode(HttpStatus.OK)
     @Post('/login')
+
     async login(@Body() body: UserLoginDto): Promise<IResponse> {
         const user: IUserDocument =
             await this.userService.findOne<IUserDocument>(
