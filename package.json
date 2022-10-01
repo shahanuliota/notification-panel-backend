@@ -81,7 +81,7 @@
     "joi": "^17.6.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.37",
-    "mongoose": "^6.5.5",
+    "mongoose": "^6.6.3",
     "morgan": "^1.10.0",
     "nest-winston": "^1.7.0",
     "nestjs-command": "^3.1.2",
