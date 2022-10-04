@@ -1,6 +1,15 @@
-import {BadRequestException, Body, Controller, Get, InternalServerErrorException, Post, Query} from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    InternalServerErrorException,
+    Post,
+    Query
+} from "@nestjs/common";
 import {GroupCreateDto} from "../dtos/create.group.dto";
-import {AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
+import {AuthAdminJwtGuard, AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
 import {IResponse, IResponsePaging} from "../../../common/response/response.interface";
@@ -14,6 +23,10 @@ import {GroupGetSerialization} from "../serializations/group.get.serialization";
 import {ENUM_GROUP_STATUS_CODE_ERROR} from "../constant/group.status-code.constant";
 import {ENUM_ERROR_STATUS_CODE_ERROR} from "../../../common/error/constants/error.status-code.constant";
 import {GroupListDto} from "../dtos/group.list.dto";
+import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
+import {GroupRequestDto} from "../dtos/group.request.dto";
+import {GetGroup} from "../decorators/group.decorator";
+import {GroupDeleteGuard} from "../decorators/group.admin.decorator";
 
 
 @Controller({
@@ -109,5 +122,27 @@ export class AppGroutController {
             availableSort,
             data: groups,
         };
+    }
+
+
+    @Response('group.delete', {classSerialization: GroupGetSerialization})
+    @GroupDeleteGuard()
+    @RequestParamGuard(GroupRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.GROUP_READ,
+        ENUM_AUTH_PERMISSIONS.GROUP_DELETE
+    )
+    @Delete('/delete/:group')
+    async delete(@GetGroup() group: AppGroupDocument): Promise<void> {
+        try {
+            await this.groupServices.deleteOne(group);
+        } catch (err) {
+            throw new InternalServerErrorException({
+                statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
+                message: 'http.serverError.internalServerError',
+                error: err.message,
+            });
+        }
+        return;
     }
 }

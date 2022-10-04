@@ -214,6 +214,7 @@ describe('E2E User', () => {
             .set('x-timestamp', timestamp.toString())
             .set('x-api-key', xApiKey);
 
+        // console.log(response);
         expect(response.status).toEqual(HttpStatus.OK);
         expect(response.body.statusCode).toEqual(HttpStatus.OK);
 
