@@ -12,7 +12,7 @@ import {GroupCreateDto} from "../dtos/create.group.dto";
 import {AuthAdminJwtGuard, AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
-import {IResponse, IResponsePaging} from "../../../common/response/response.interface";
+import {IResponsePaging} from "../../../common/response/response.interface";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {GroupService} from "../services/group.service";
@@ -27,6 +27,7 @@ import {RequestParamGuard} from "../../../common/request/decorators/request.deco
 import {GroupRequestDto} from "../dtos/group.request.dto";
 import {GetGroup} from "../decorators/group.decorator";
 import {GroupDeleteGuard} from "../decorators/group.admin.decorator";
+import {IGroup} from "../group.interface";
 
 
 @Controller({
@@ -47,7 +48,7 @@ export class AppGroutController {
         ENUM_AUTH_PERMISSIONS.GROUP_CREATE
     )
     @Post('/create')
-    async createGroup(@Body() dto: GroupCreateDto, @GetUser() user: IUserDocument): Promise<IResponse> {
+    async createGroup(@Body() dto: GroupCreateDto, @GetUser() user: IUserDocument): Promise<IGroup> {
         const exist = await this.groupServices.findOne({
             name: dto.name,
             owner: user._id
@@ -60,6 +61,7 @@ export class AppGroutController {
         }
         try {
             const data: AppGroupDocument = await this.groupServices.create(dto, user);
+            const res: IGroup = new IGroup(data);
             return data['_doc'];
         } catch (err) {
             throw new InternalServerErrorException({
