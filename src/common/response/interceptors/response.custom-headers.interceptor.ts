@@ -1,19 +1,13 @@
-import {
-    Injectable,
-    NestInterceptor,
-    ExecutionContext,
-    CallHandler,
-} from '@nestjs/common';
-import { map, Observable } from 'rxjs';
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Response } from 'express';
-import { IRequestApp } from 'src/common/request/request.interface';
+import {CallHandler, ExecutionContext, Injectable, NestInterceptor,} from '@nestjs/common';
+import {map, Observable} from 'rxjs';
+import {HttpArgumentsHost} from '@nestjs/common/interfaces';
+import {Response} from 'express';
+import {IRequestApp} from 'src/common/request/request.interface';
 
 // only for response success and error in controller
 @Injectable()
 export class ResponseCustomHeadersInterceptor
-    implements NestInterceptor<Promise<any>>
-{
+    implements NestInterceptor<Promise<any>> {
     async intercept(
         context: ExecutionContext,
         next: CallHandler
@@ -24,6 +18,11 @@ export class ResponseCustomHeadersInterceptor
                     const ctx: HttpArgumentsHost = context.switchToHttp();
                     const responseExpress: Response = ctx.getResponse();
                     const request: IRequestApp = ctx.getRequest();
+                    console.log(responseExpress.get('Content-Type'));
+
+                    if (responseExpress.get('Content-Type') === 'text/event-stream') {
+                        return response;
+                    }
 
                     responseExpress.setHeader(
                         'x-custom-lang',
