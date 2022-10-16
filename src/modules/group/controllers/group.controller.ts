@@ -1,9 +1,18 @@
-import {BadRequestException, Body, Controller, Get, InternalServerErrorException, Post, Query} from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    InternalServerErrorException,
+    Post,
+    Query
+} from "@nestjs/common";
 import {GroupCreateDto} from "../dtos/create.group.dto";
-import {AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
+import {AuthAdminJwtGuard, AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
-import {IResponse, IResponsePaging} from "../../../common/response/response.interface";
+import {IResponsePaging} from "../../../common/response/response.interface";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {GroupService} from "../services/group.service";
@@ -14,6 +23,11 @@ import {GroupGetSerialization} from "../serializations/group.get.serialization";
 import {ENUM_GROUP_STATUS_CODE_ERROR} from "../constant/group.status-code.constant";
 import {ENUM_ERROR_STATUS_CODE_ERROR} from "../../../common/error/constants/error.status-code.constant";
 import {GroupListDto} from "../dtos/group.list.dto";
+import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
+import {GroupRequestDto} from "../dtos/group.request.dto";
+import {GetGroup} from "../decorators/group.decorator";
+import {GroupDeleteGuard} from "../decorators/group.admin.decorator";
+import {IGroup} from "../group.interface";
 
 
 @Controller({
@@ -34,7 +48,7 @@ export class AppGroutController {
         ENUM_AUTH_PERMISSIONS.GROUP_CREATE
     )
     @Post('/create')
-    async createGroup(@Body() dto: GroupCreateDto, @GetUser() user: IUserDocument): Promise<IResponse> {
+    async createGroup(@Body() dto: GroupCreateDto, @GetUser() user: IUserDocument): Promise<IGroup> {
         const exist = await this.groupServices.findOne({
             name: dto.name,
             owner: user._id
@@ -47,6 +61,7 @@ export class AppGroutController {
         }
         try {
             const data: AppGroupDocument = await this.groupServices.create(dto, user);
+            const res: IGroup = new IGroup(data);
             return data['_doc'];
         } catch (err) {
             throw new InternalServerErrorException({
@@ -109,5 +124,27 @@ export class AppGroutController {
             availableSort,
             data: groups,
         };
+    }
+
+
+    @Response('group.delete', {classSerialization: GroupGetSerialization})
+    @GroupDeleteGuard()
+    @RequestParamGuard(GroupRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.GROUP_READ,
+        ENUM_AUTH_PERMISSIONS.GROUP_DELETE
+    )
+    @Delete('/delete/:group')
+    async delete(@GetGroup() group: AppGroupDocument): Promise<void> {
+        try {
+            await this.groupServices.deleteOne(group);
+        } catch (err) {
+            throw new InternalServerErrorException({
+                statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
+                message: 'http.serverError.internalServerError',
+                error: err.message,
+            });
+        }
+        return;
     }
 }

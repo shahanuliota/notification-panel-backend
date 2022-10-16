@@ -59,6 +59,7 @@ export class UserController {
     @AuthJwtGuard()
     @Get('/profile')
     async profile(@GetUser() user: IUserDocument): Promise<IResponse> {
+       
         return user;
     }
 

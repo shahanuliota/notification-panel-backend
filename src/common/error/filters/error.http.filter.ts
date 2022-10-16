@@ -1,17 +1,12 @@
-import {
-    ExceptionFilter,
-    Catch,
-    ArgumentsHost,
-    HttpException,
-} from '@nestjs/common';
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { ValidationError } from 'class-validator';
-import { Response } from 'express';
-import { DebuggerService } from 'src/common/debugger/services/debugger.service';
-import { IMessage } from 'src/common/message/message.interface';
-import { MessageService } from 'src/common/message/services/message.service';
-import { IRequestApp } from 'src/common/request/request.interface';
-import { ERROR_TYPE } from '../constants/error.enum.constant';
+import {ArgumentsHost, Catch, ExceptionFilter, HttpException,} from '@nestjs/common';
+import {HttpArgumentsHost} from '@nestjs/common/interfaces';
+import {ValidationError} from 'class-validator';
+import {Response} from 'express';
+import {DebuggerService} from 'src/common/debugger/services/debugger.service';
+import {IMessage} from 'src/common/message/message.interface';
+import {MessageService} from 'src/common/message/services/message.service';
+import {IRequestApp} from 'src/common/request/request.interface';
+import {ERROR_TYPE} from '../constants/error.enum.constant';
 import {
     IErrorException,
     IErrorHttpFilter,
@@ -28,7 +23,8 @@ export class ErrorHttpFilter implements ExceptionFilter {
     constructor(
         private readonly messageService: MessageService,
         private readonly debuggerService: DebuggerService
-    ) {}
+    ) {
+    }
 
     async catch(exception: HttpException, host: ArgumentsHost): Promise<void> {
         const ctx: HttpArgumentsHost = host.switchToHttp();
@@ -50,7 +46,7 @@ export class ErrorHttpFilter implements ExceptionFilter {
         const __repoVersion = request.repoVersion;
 
         // message base in language
-        const { customLang } = ctx.getRequest<IRequestApp>();
+        const {customLang} = ctx.getRequest<IRequestApp>();
 
         // Debugger
         this.debuggerService.error(
@@ -61,7 +57,7 @@ export class ErrorHttpFilter implements ExceptionFilter {
                 function: __function,
                 path: __path,
             },
-            exception
+            {exception}
         );
 
         // Restructure
@@ -84,23 +80,23 @@ export class ErrorHttpFilter implements ExceptionFilter {
             metadata,
         } = responseException;
 
-        let { errors } = responseException;
+        let {errors} = responseException;
         if (errors && errors.length > 0) {
             errors =
                 errorType === ERROR_TYPE.IMPORT
                     ? await this.messageService.getImportErrorsMessage(
-                          errors as IValidationErrorImport[],
-                          customLang
-                      )
+                        errors as IValidationErrorImport[],
+                        customLang
+                    )
                     : await this.messageService.getRequestErrorsMessage(
-                          errors as ValidationError[],
-                          customLang
-                      );
+                        errors as ValidationError[],
+                        customLang
+                    );
         }
 
         const mapMessage: string | IMessage = await this.messageService.get(
             message,
-            { customLanguages: customLang, properties }
+            {customLanguages: customLang, properties}
         );
 
         const resMetadata: IErrorHttpFilterMetadata = {

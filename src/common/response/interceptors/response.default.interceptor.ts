@@ -1,40 +1,31 @@
-import {
-    Injectable,
-    NestInterceptor,
-    ExecutionContext,
-    CallHandler,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Response } from 'express';
-import { IResponse } from '../response.interface';
-import { IRequestApp } from 'src/common/request/request.interface';
-import { IMessageOptionsProperties } from 'src/common/message/message.interface';
-import { MessageService } from 'src/common/message/services/message.service';
-import { Reflector } from '@nestjs/core';
+import {CallHandler, ExecutionContext, Injectable, NestInterceptor,} from '@nestjs/common';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {HttpArgumentsHost} from '@nestjs/common/interfaces';
+import {Response} from 'express';
+import {IResponse} from '../response.interface';
+import {IRequestApp} from 'src/common/request/request.interface';
+import {IMessageOptionsProperties} from 'src/common/message/message.interface';
+import {MessageService} from 'src/common/message/services/message.service';
+import {Reflector} from '@nestjs/core';
 import {
     RESPONSE_MESSAGE_PATH_META_KEY,
+    RESPONSE_MESSAGE_PROPERTIES_META_KEY,
     RESPONSE_SERIALIZATION_META_KEY,
     RESPONSE_SERIALIZATION_OPTIONS_META_KEY,
-    RESPONSE_MESSAGE_PROPERTIES_META_KEY,
 } from '../constants/response.constant';
-import {
-    ClassConstructor,
-    ClassTransformOptions,
-    plainToInstance,
-} from 'class-transformer';
-import { ResponseDefaultDto } from '../dtos/response.default.dto';
-import { IErrorHttpFilterMetadata } from 'src/common/error/error.interface';
+import {ClassConstructor, ClassTransformOptions, plainToInstance,} from 'class-transformer';
+import {ResponseDefaultDto} from '../dtos/response.default.dto';
+import {IErrorHttpFilterMetadata} from 'src/common/error/error.interface';
 
 @Injectable()
 export class ResponseDefaultInterceptor
-    implements NestInterceptor<Promise<any>>
-{
+    implements NestInterceptor<Promise<any>> {
     constructor(
         private readonly reflector: Reflector,
         private readonly messageService: MessageService
-    ) {}
+    ) {
+    }
 
     async intercept(
         context: ExecutionContext,
@@ -69,7 +60,7 @@ export class ResponseDefaultInterceptor
                         );
 
                     // message base on language
-                    const { customLang } = ctx.getRequest<IRequestApp>();
+                    const {customLang} = ctx.getRequest<IRequestApp>();
 
                     // default response
                     let statusCode: number = responseExpress.statusCode;
@@ -97,8 +88,10 @@ export class ResponseDefaultInterceptor
 
                     // response
                     const response = (await responseData) as IResponse;
+                    // console.log(response);
                     if (response) {
-                        const { metadata, ...data } = response;
+                        const {metadata, ...data} = response;
+                        // console.log(data);
                         let properties: IMessageOptionsProperties =
                             messageProperties;
                         let serialization = data;
@@ -136,7 +129,7 @@ export class ResponseDefaultInterceptor
                         return {
                             statusCode,
                             message,
-                            metadata: { ...resMetadata, ...metadata },
+                            metadata: {...resMetadata, ...metadata},
                             data: serialization,
                         };
                     }

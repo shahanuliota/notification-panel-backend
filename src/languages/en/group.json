@@ -2,6 +2,7 @@
   "list": "Group list succeed",
   "get": "Group get succeed",
   "create": "Group creation succeed",
+  "delete": "Group delete succeed",
   "update": "Group update succeed",
   "active": "Group active succeed",
   "inactive": "Group inactive succeed",
