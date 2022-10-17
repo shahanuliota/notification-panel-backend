@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
+import {ArrayNotEmpty, IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
 import {Transform} from "class-transformer";
 
 export class CreateApplicationDto {
@@ -28,4 +28,10 @@ export class CreateApplicationDto {
     @IsString()
     @IsOptional()
     readonly gcm_key: string;
+
+    @IsMongoId({each: true})
+    @ArrayNotEmpty()
+    @IsArray()
+    @IsNotEmpty()
+    readonly groups: string[];
 }

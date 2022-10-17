@@ -25,13 +25,12 @@ export class ApplicationService {
                 message_able_players: data.message_able_players,
                 basic_auth_key: data.basic_auth_key,
                 application_id: data.application_id,
-                //    gcm_key: data.gcm_key,
-
+                groups: data.groups
             });
 
             return create.save();
-        } catch (e) {
 
+        } catch (e) {
             console.log(e);
             throw e;
         }
@@ -83,7 +82,7 @@ export class ApplicationService {
         application.players = players;
         application.message_able_players = message_able_players;
         application.gcm_key = gcm_key;
-        
+
         return application.save();
     }
 
