@@ -1,6 +1,7 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {Document, Types} from 'mongoose';
 import {UserEntity} from "../../user/schemas/user.schema";
+import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
 
 @Schema({timestamps: true, versionKey: false})
 export class ApplicationEntity {
@@ -18,6 +19,15 @@ export class ApplicationEntity {
         ref: UserEntity.name,
     })
     owner: Types.ObjectId;
+
+
+    @Prop({
+        required: false,
+        type: Array,
+        ref: AppGroupEntity.name,
+        default: []
+    })
+    groups: Types.ObjectId[];
 
     @Prop({
         required: true,
