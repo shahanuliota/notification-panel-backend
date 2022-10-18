@@ -3,7 +3,7 @@ import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {ApplicationService} from "../services/application.service";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
-import {AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
+import {AuthAdminJwtGuard, AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {ENUM_AUTH_PERMISSIONS} from "../../../common/auth/constants/auth.enum.permission.constant";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
@@ -13,6 +13,10 @@ import {Response, ResponsePaging} from "../../../common/response/decorators/resp
 import {ApplicationGetSerialization} from "../serialization/application.get.serialization";
 import {ListApplicationDto} from "../dtos/list.application.dto";
 import {IApplicationDocument} from "../application.interface";
+import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
+import {GetApplication} from "../decorators/application.decorator";
+import {ApplicationRequestDto} from "../dtos/application.request.dto";
+import {ApplicationGetGuard} from "../decorators/application.admin.decorator";
 
 @Controller({
     version: '1',
@@ -87,6 +91,15 @@ export class ApplicationController {
             availableSort,
             data: applications,
         };
+    }
+
+    @Response('role.get',)
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
+    @Get('get/:application')
+    async get(@GetApplication() app: IApplicationDocument): Promise<IResponse> {
+        return app;
     }
 
 

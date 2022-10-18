@@ -1,4 +1,4 @@
-export class IGroup {
+export interface IGroupDocument {
 
     readonly _id: string;
 
@@ -8,12 +8,12 @@ export class IGroup {
     readonly owner: string;
     readonly createdAt: Date;
 
-    constructor(data) {
-        this.name = data.name;
-        this._id = data._id;
-        this.isActive = data.isActive;
-        this.description = data.description;
-        this.createdAt = data.createdAt;
-        this.owner = data.owner.toString();
-    }
+    // constructor(data) {
+    //     this.name = data.name;
+    //     this._id = data._id;
+    //     this.isActive = data.isActive;
+    //     this.description = data.description;
+    //     this.createdAt = data.createdAt;
+    //     this.owner = data.owner.toString();
+    // }
 }
