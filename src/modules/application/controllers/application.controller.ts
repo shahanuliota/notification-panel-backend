@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Query} from "@nestjs/common";
+import {Body, Controller, Get, Post, Put, Query} from "@nestjs/common";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {ApplicationService} from "../services/application.service";
@@ -17,6 +17,7 @@ import {RequestParamGuard} from "../../../common/request/decorators/request.deco
 import {GetApplication} from "../decorators/application.decorator";
 import {ApplicationRequestDto} from "../dtos/application.request.dto";
 import {ApplicationGetGuard} from "../decorators/application.admin.decorator";
+import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 
 @Controller({
     version: '1',
@@ -93,13 +94,27 @@ export class ApplicationController {
         };
     }
 
-    @Response('role.get',)
+    @Response('application.get',)
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)
     @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
     @Get('get/:application')
     async get(@GetApplication() app: IApplicationDocument): Promise<IResponse> {
         return app;
+    }
+
+
+    @Response('application.update')
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
+        ENUM_AUTH_PERMISSIONS.APPLICATION_UPDATE
+    )
+    @Put('/update/:application')
+    async update(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
+
+        return {dto, app};
     }
 
 

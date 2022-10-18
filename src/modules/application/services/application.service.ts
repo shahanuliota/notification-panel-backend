@@ -5,8 +5,8 @@ import {ApplicationDocument, ApplicationEntity} from "../schemas/application.sch
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {IUserDocument} from "../../user/user.interface";
 import {IDatabaseFindAllOptions, IDatabaseFindOneOptions} from "../../../common/database/database.interface";
-import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
+import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 
 @Injectable()
 export class ApplicationService {
