@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, InternalServerErrorException, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {ApplicationService} from "../services/application.service";
@@ -18,7 +18,6 @@ import {GetApplication} from "../decorators/application.decorator";
 import {ApplicationRequestDto} from "../dtos/application.request.dto";
 import {ApplicationGetGuard} from "../decorators/application.admin.decorator";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
-import {ENUM_ERROR_STATUS_CODE_ERROR} from "../../../common/error/constants/error.status-code.constant";
 
 @Controller({
     version: '1',
@@ -104,6 +103,15 @@ export class ApplicationController {
         return app;
     }
 
+    @Response('application.get',)
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
+    @Delete('delete/:application')
+    async delete(@GetApplication() app: IApplicationDocument): Promise<IResponse> {
+        return await this.applicationService.deleteOne({_id: app._id});
+    }
+
 
     @Response('application.update')
     @ApplicationGetGuard()
@@ -129,28 +137,6 @@ export class ApplicationController {
     async removeGroup(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
 
         return await this.applicationService.removeGroup(app._id, dto);
-    }
-
-    @Response('application.delete')
-    @ApplicationGetGuard()
-    @RequestParamGuard(ApplicationRequestDto)
-    @AuthAdminJwtGuard(
-        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
-        ENUM_AUTH_PERMISSIONS.APPLICATION_DELETE
-    )
-    @Delete('/delete/:application')
-    async delete(@GetApplication() app: IApplicationDocument): Promise<void> {
-        try {
-            await this.applicationService.deleteOne({_id: app._id});
-        } catch (err: any) {
-            throw new InternalServerErrorException({
-                statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
-                message: 'http.serverError.internalServerError',
-                error: err.message,
-            });
-        }
-
-        return;
     }
 
 
