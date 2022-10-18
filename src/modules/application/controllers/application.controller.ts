@@ -12,6 +12,7 @@ import {ApplicationDocument} from "../schemas/application.schema";
 import {Response, ResponsePaging} from "../../../common/response/decorators/response.decorator";
 import {ApplicationGetSerialization} from "../serialization/application.get.serialization";
 import {ListApplicationDto} from "../dtos/list.application.dto";
+import {IApplicationDocument} from "../application.interface";
 
 @Controller({
     version: '1',
@@ -65,8 +66,8 @@ export class ApplicationController {
             owner: user._id,
             ...search,
         };
-        const applications: ApplicationDocument[] =
-            await this.applicationService.findAll(find, {
+        const applications: IApplicationDocument[] =
+            await this.applicationService.findAll<IApplicationDocument>(find, {
                 skip: skip,
                 limit: perPage,
                 sort,

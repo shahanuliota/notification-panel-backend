@@ -1,5 +1,6 @@
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
 import {ApplicationService} from "../services/application.service";
+import {IApplicationDocument} from "../application.interface";
 
 @Injectable()
 export class ApplicationPutToRequestGuard implements CanActivate {
@@ -11,8 +12,8 @@ export class ApplicationPutToRequestGuard implements CanActivate {
         const {params} = request;
         const {application} = params;
 
-        const app =
-            await this.applicationService.findOneById(application, {
+        const app: IApplicationDocument =
+            await this.applicationService.findOneById<IApplicationDocument>(application, {
                 populate: {
                     groups: true,
                 },

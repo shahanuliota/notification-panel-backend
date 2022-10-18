@@ -38,10 +38,10 @@ export class ApplicationService {
     }
 
 
-    async findAll(
+    async findAll<T>(
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
-    ): Promise<ApplicationDocument[]> {
+    ): Promise<T[]> {
         const findAll = this.applicationModel.find(find);
         if (
             options &&
@@ -57,7 +57,7 @@ export class ApplicationService {
         return findAll.lean();
     }
 
-    async findOneById(_id: string, options?: IDatabaseFindOneOptions): Promise<ApplicationDocument> {
+    async findOneById<T>(_id: string, options?: IDatabaseFindOneOptions): Promise<T> {
         const applications = this.applicationModel.findById(_id);
 
         if (options && options.populate && options.populate.groups) {
