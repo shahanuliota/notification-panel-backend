@@ -1,0 +1,1 @@
+export const APPLICATION_ACTIVE_META_KEY = 'ApplicationActiveMetaKey';

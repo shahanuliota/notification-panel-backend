@@ -4,8 +4,9 @@ import {Model} from "mongoose";
 import {ApplicationDocument, ApplicationEntity} from "../schemas/application.schema";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {IUserDocument} from "../../user/user.interface";
-import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
+import {IDatabaseFindAllOptions, IDatabaseFindOneOptions} from "../../../common/database/database.interface";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
+import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
 
 @Injectable()
 export class ApplicationService {
@@ -56,8 +57,17 @@ export class ApplicationService {
         return findAll.lean();
     }
 
-    async findOneById(_id: string): Promise<ApplicationDocument> {
-        return this.applicationModel.findById(_id).lean();
+    async findOneById(_id: string, options?: IDatabaseFindOneOptions): Promise<ApplicationDocument> {
+        const applications = this.applicationModel.findById(_id);
+
+        if (options && options.populate && options.populate.groups) {
+            applications.populate({
+                path: 'groups',
+                model: AppGroupEntity.name,
+            });
+        }
+
+        return applications.lean();
     }
 
     async findOne(find?: Record<string, any>): Promise<ApplicationDocument> {
@@ -89,7 +99,6 @@ export class ApplicationService {
     async inactive(_id: string): Promise<ApplicationDocument> {
         const application: ApplicationDocument =
             await this.applicationModel.findById(_id);
-
         application.isActive = false;
         return application.save();
     }

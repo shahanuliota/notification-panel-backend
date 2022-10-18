@@ -23,10 +23,6 @@ export class ApplicationController {
                 private readonly applicationService: ApplicationService) {
     }
 
-    @Get('/hello')
-    async hello() {
-        return "hello application";
-    }
 
     @Response('application.create', {
         classSerialization: ApplicationGetSerialization
