@@ -4,8 +4,10 @@ import {Model} from "mongoose";
 import {ApplicationDocument, ApplicationEntity} from "../schemas/application.schema";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {IUserDocument} from "../../user/user.interface";
-import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
+import {IDatabaseFindAllOptions, IDatabaseFindOneOptions} from "../../../common/database/database.interface";
+import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
+import {IApplicationDocument} from "../application.interface";
 
 @Injectable()
 export class ApplicationService {
@@ -37,10 +39,10 @@ export class ApplicationService {
     }
 
 
-    async findAll(
+    async findAll<T>(
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
-    ): Promise<ApplicationDocument[]> {
+    ): Promise<T[]> {
         const findAll = this.applicationModel.find(find);
         if (
             options &&
@@ -56,8 +58,17 @@ export class ApplicationService {
         return findAll.lean();
     }
 
-    async findOneById(_id: string): Promise<ApplicationDocument> {
-        return this.applicationModel.findById(_id).lean();
+    async findOneById<T>(_id: string, options?: IDatabaseFindOneOptions): Promise<T> {
+        const applications = this.applicationModel.findById(_id);
+
+        if (options && options.populate && options.populate.groups) {
+            applications.populate({
+                path: 'groups',
+                model: AppGroupEntity.name,
+            });
+        }
+
+        return applications.lean();
     }
 
     async findOne(find?: Record<string, any>): Promise<ApplicationDocument> {
@@ -75,21 +86,23 @@ export class ApplicationService {
 
     async update(
         _id: string,
-        {name, players, message_able_players, gcm_key}: ApplicationUpdateDto
-    ): Promise<ApplicationDocument> {
-        const application: ApplicationDocument = await this.applicationModel.findById(_id);
-        application.name = name;
-        application.players = players;
-        application.message_able_players = message_able_players;
-        application.gcm_key = gcm_key;
+        {name, players, message_able_players, gcm_key, groups}: ApplicationUpdateDto
+    ): Promise<IApplicationDocument> {
+        console.log(groups);
 
-        return application.save();
+
+        await this.applicationModel.findByIdAndUpdate<IApplicationDocument>({_id}, {
+            name,
+            players,
+            message_able_players, gcm_key,
+            $addToSet: {groups: {$each: [...groups]}}
+        });
+        return this.findOneById<IApplicationDocument>(_id);
     }
 
     async inactive(_id: string): Promise<ApplicationDocument> {
         const application: ApplicationDocument =
             await this.applicationModel.findById(_id);
-
         application.isActive = false;
         return application.save();
     }

@@ -5,6 +5,7 @@
   "update": "Application update succeed",
   "active": "Application active succeed",
   "inactive": "Application inactive succeed",
+  "delete": "Application delete succeed",
   "error": {
     "notFound": "Application not found",
     "active": "Application active status invalid",

@@ -61,7 +61,7 @@ export class AppGroutController {
         }
         try {
             const data: AppGroupDocument = await this.groupServices.create(dto, user);
-            const res: IGroup = new IGroup(data);
+            // const res: IGroup = new IGroup(data);
             return data['_doc'];
         } catch (err) {
             throw new InternalServerErrorException({

@@ -1,9 +1,9 @@
-import {Body, Controller, Get, Post, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, InternalServerErrorException, Post, Put, Query} from "@nestjs/common";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {ApplicationService} from "../services/application.service";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
-import {AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
+import {AuthAdminJwtGuard, AuthJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {ENUM_AUTH_PERMISSIONS} from "../../../common/auth/constants/auth.enum.permission.constant";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
@@ -12,6 +12,13 @@ import {ApplicationDocument} from "../schemas/application.schema";
 import {Response, ResponsePaging} from "../../../common/response/decorators/response.decorator";
 import {ApplicationGetSerialization} from "../serialization/application.get.serialization";
 import {ListApplicationDto} from "../dtos/list.application.dto";
+import {IApplicationDocument} from "../application.interface";
+import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
+import {GetApplication} from "../decorators/application.decorator";
+import {ApplicationRequestDto} from "../dtos/application.request.dto";
+import {ApplicationGetGuard} from "../decorators/application.admin.decorator";
+import {ApplicationUpdateDto} from "../dtos/update.application.dto";
+import {ENUM_ERROR_STATUS_CODE_ERROR} from "../../../common/error/constants/error.status-code.constant";
 
 @Controller({
     version: '1',
@@ -23,10 +30,6 @@ export class ApplicationController {
                 private readonly applicationService: ApplicationService) {
     }
 
-    @Get('/hello')
-    async hello() {
-        return "hello application";
-    }
 
     @Response('application.create', {
         classSerialization: ApplicationGetSerialization
@@ -69,8 +72,8 @@ export class ApplicationController {
             owner: user._id,
             ...search,
         };
-        const applications: ApplicationDocument[] =
-            await this.applicationService.findAll(find, {
+        const applications: IApplicationDocument[] =
+            await this.applicationService.findAll<IApplicationDocument>(find, {
                 skip: skip,
                 limit: perPage,
                 sort,
@@ -90,6 +93,51 @@ export class ApplicationController {
             availableSort,
             data: applications,
         };
+    }
+
+    @Response('application.get',)
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
+    @Get('get/:application')
+    async get(@GetApplication() app: IApplicationDocument): Promise<IResponse> {
+        return app;
+    }
+
+
+    @Response('application.update')
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
+        ENUM_AUTH_PERMISSIONS.APPLICATION_UPDATE
+    )
+    @Put('/update/:application')
+    async update(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
+
+        return await this.applicationService.update(app._id, dto);
+    }
+
+    @Response('application.delete')
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
+        ENUM_AUTH_PERMISSIONS.APPLICATION_DELETE
+    )
+    @Delete('/delete/:application')
+    async delete(@GetApplication() app: IApplicationDocument): Promise<void> {
+        try {
+            await this.applicationService.deleteOne({_id: app._id});
+        } catch (err: any) {
+            throw new InternalServerErrorException({
+                statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
+                message: 'http.serverError.internalServerError',
+                error: err.message,
+            });
+        }
+
+        return;
     }
 
 
