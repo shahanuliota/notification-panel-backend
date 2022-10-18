@@ -118,6 +118,19 @@ export class ApplicationController {
         return await this.applicationService.update(app._id, dto);
     }
 
+    @Response('application.update')
+    @ApplicationGetGuard()
+    @RequestParamGuard(ApplicationRequestDto)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
+        ENUM_AUTH_PERMISSIONS.APPLICATION_UPDATE
+    )
+    @Put('/remove-group/:application')
+    async removeGroup(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
+
+        return await this.applicationService.removeGroup(app._id, dto);
+    }
+
     @Response('application.delete')
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)

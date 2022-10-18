@@ -88,17 +88,46 @@ export class ApplicationService {
         _id: string,
         {name, players, message_able_players, gcm_key, groups}: ApplicationUpdateDto
     ): Promise<IApplicationDocument> {
-        console.log(groups);
 
-
-        await this.applicationModel.findByIdAndUpdate<IApplicationDocument>({_id}, {
+        const body = {
             name,
             players,
             message_able_players, gcm_key,
-            $addToSet: {groups: {$each: [...groups]}}
-        });
+
+        };
+
+        let update = {};
+        if (groups) {
+            update = {
+                ...body,
+                $addToSet: {groups: {$each: [...groups]}},
+            };
+        } else {
+            update = body;
+        }
+
+
+        await this.applicationModel.findByIdAndUpdate<IApplicationDocument>({_id}, update);
         return this.findOneById<IApplicationDocument>(_id);
     }
+
+    async removeGroup(
+        _id: string,
+        {groups}: ApplicationUpdateDto
+    ): Promise<IApplicationDocument> {
+
+
+        if (groups) {
+            const update = {
+                $pullAll: {groups: [...groups]},
+            };
+            await this.applicationModel.findByIdAndUpdate<IApplicationDocument>({_id}, update);
+        }
+
+
+        return this.findOneById<IApplicationDocument>(_id);
+    }
+
 
     async inactive(_id: string): Promise<ApplicationDocument> {
         const application: ApplicationDocument =
