@@ -7,6 +7,7 @@ import {IUserDocument} from "../../user/user.interface";
 import {IDatabaseFindAllOptions, IDatabaseFindOneOptions} from "../../../common/database/database.interface";
 import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
+import {IApplicationDocument} from "../application.interface";
 
 @Injectable()
 export class ApplicationService {
@@ -85,15 +86,18 @@ export class ApplicationService {
 
     async update(
         _id: string,
-        {name, players, message_able_players, gcm_key}: ApplicationUpdateDto
-    ): Promise<ApplicationDocument> {
-        const application: ApplicationDocument = await this.applicationModel.findById(_id);
-        application.name = name;
-        application.players = players;
-        application.message_able_players = message_able_players;
-        application.gcm_key = gcm_key;
+        {name, players, message_able_players, gcm_key, groups}: ApplicationUpdateDto
+    ): Promise<IApplicationDocument> {
+        console.log(groups);
 
-        return application.save();
+
+        await this.applicationModel.findByIdAndUpdate<IApplicationDocument>({_id}, {
+            name,
+            players,
+            message_able_players, gcm_key,
+            $addToSet: {groups: {$each: [...groups]}}
+        });
+        return this.findOneById<IApplicationDocument>(_id);
     }
 
     async inactive(_id: string): Promise<ApplicationDocument> {

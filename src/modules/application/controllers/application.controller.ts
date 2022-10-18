@@ -114,7 +114,8 @@ export class ApplicationController {
     @Put('/update/:application')
     async update(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
 
-        return {dto, app};
+        return await this.applicationService.update(app._id, dto);
+
     }
 
 
