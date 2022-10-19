@@ -9,6 +9,7 @@
   "error": {
     "notFound": "Group not found",
     "active": "Group active status invalid",
-    "exist": "Group already exist"
+    "exist": "Group already exist",
+    "used": "Group in used"
   }
 }
