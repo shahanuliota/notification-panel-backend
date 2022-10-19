@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {ConflictException, Injectable} from "@nestjs/common";
 import {DatabaseEntity} from "../../../common/database/decorators/database.decorator";
 import {Model} from "mongoose";
 import {ApplicationDocument, ApplicationEntity} from "../schemas/application.schema";
@@ -8,6 +8,8 @@ import {IDatabaseFindAllOptions, IDatabaseFindOneOptions} from "../../../common/
 import {AppGroupEntity} from "../../group/schemas/app-groups.schema";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 import {IApplicationDocument} from "../application.interface";
+import {MongoError} from 'mongodb';
+import {ENUM_APPLICATION_STATUS_CODE_ERROR} from "../constant/application.status-code.enum";
 
 @Injectable()
 export class ApplicationService {
@@ -30,11 +32,18 @@ export class ApplicationService {
                 groups: data.groups
             });
 
-            return create.save();
+            await create.save();
+            return create['_doc'];
 
-        } catch (e) {
-            console.log(e);
-            throw e;
+        } catch (error) {
+            if ((error as MongoError).code === 11000) {
+
+                throw new ConflictException({
+                    statusCode: ENUM_APPLICATION_STATUS_CODE_ERROR.APPLICATION_EXIST_ERROR,
+                    message: 'application.error.exist',
+                });
+            }
+            throw error;
         }
     }
 
@@ -79,8 +88,8 @@ export class ApplicationService {
         return this.applicationModel.countDocuments(find);
     }
 
-    async deleteOne(find: Record<string, any>): Promise<ApplicationDocument> {
-        return this.applicationModel.findOneAndDelete(find);
+    async deleteOne<T>(find: Record<string, any>): Promise<T> {
+        return this.applicationModel.findOneAndDelete(find).lean();
     }
 
 
