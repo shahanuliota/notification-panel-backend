@@ -41,7 +41,7 @@ export class ApplicationController {
     @Post('create')
     async create(@Body() dto: CreateApplicationDto, @GetUser() user: IUserDocument): Promise<IResponse> {
         const data1: ApplicationDocument = await this.applicationService.create(dto, user);
-        return {...data1["_doc"]};
+        return {...data1};
     }
 
 
@@ -94,7 +94,9 @@ export class ApplicationController {
         };
     }
 
-    @Response('application.get',)
+    @Response('application.get', {
+        classSerialization: ApplicationGetSerialization
+    })
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)
     @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
@@ -103,13 +105,15 @@ export class ApplicationController {
         return app;
     }
 
-    @Response('application.get',)
+    @Response('application.get', {
+        classSerialization: ApplicationGetSerialization
+    })
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)
     @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
     @Delete('delete/:application')
     async delete(@GetApplication() app: IApplicationDocument): Promise<IResponse> {
-        return await this.applicationService.deleteOne({_id: app._id});
+        return await this.applicationService.deleteOne<IApplicationDocument>({_id: app._id});
     }
 
 

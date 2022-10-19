@@ -30,7 +30,8 @@ export class ApplicationService {
                 groups: data.groups
             });
 
-            return create.save();
+            await create.save();
+            return create['_doc'];
 
         } catch (e) {
             console.log(e);
@@ -79,8 +80,8 @@ export class ApplicationService {
         return this.applicationModel.countDocuments(find);
     }
 
-    async deleteOne(find: Record<string, any>): Promise<ApplicationDocument> {
-        return this.applicationModel.findOneAndDelete(find);
+    async deleteOne<T>(find: Record<string, any>): Promise<T> {
+        return this.applicationModel.findOneAndDelete(find).lean();
     }
 
 
