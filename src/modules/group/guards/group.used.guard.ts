@@ -13,14 +13,16 @@ export class GroupUsedGuard implements CanActivate {
 
 
         const query = {
-            'groups': __group._id,
-
+            'groups': __group._id.toString(),
         };
-       
+
+        console.log({__group});
+        console.log({query});
 
         const check: ApplicationDocument = await this.applicationService.findOne(query);
 
 
+        console.log({check});
         if (check) {
             throw new ForbiddenException({
                 statusCode: ENUM_GROUP_STATUS_CODE_ERROR.GROUP_USED_ERROR,
