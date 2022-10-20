@@ -1,18 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { IAuthApi, IAuthApiRequestHashedData } from '../auth.interface';
-import { ConfigService } from '@nestjs/config';
-import { AuthApiDocument, AuthApiEntity } from '../schemas/auth.api.schema';
-import { HelperStringService } from 'src/common/helper/services/helper.string.service';
-import { HelperHashService } from 'src/common/helper/services/helper.hash.service';
-import { HelperEncryptionService } from 'src/common/helper/services/helper.encryption.service';
-import { IDatabaseFindAllOptions } from 'src/common/database/database.interface';
-import { AuthApiUpdateDto } from '../dtos/auth.api.update.dto';
-import {
-    AuthApiCreateDto,
-    AuthApiCreateRawDto,
-} from '../dtos/auth.api.create.dto';
-import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
+import {Injectable} from '@nestjs/common';
+import {Model} from 'mongoose';
+import {IAuthApi, IAuthApiRequestHashedData} from '../auth.interface';
+import {ConfigService} from '@nestjs/config';
+import {AuthApiDocument, AuthApiEntity} from '../schemas/auth.api.schema';
+import {HelperStringService} from 'src/common/helper/services/helper.string.service';
+import {HelperHashService} from 'src/common/helper/services/helper.hash.service';
+import {HelperEncryptionService} from 'src/common/helper/services/helper.encryption.service';
+import {IDatabaseFindAllOptions} from 'src/common/database/database.interface';
+import {AuthApiUpdateDto} from '../dtos/auth.api.update.dto';
+import {AuthApiCreateDto, AuthApiCreateRawDto,} from '../dtos/auth.api.create.dto';
+import {DatabaseEntity} from 'src/common/database/decorators/database.decorator';
 
 @Injectable()
 export class AuthApiService {
@@ -64,7 +61,7 @@ export class AuthApiService {
     }
 
     async findOneByKey(key: string): Promise<AuthApiDocument> {
-        return this.authApiModel.findOne({ key }).lean();
+        return this.authApiModel.findOne({key}).lean();
     }
 
     async inactive(_id: string): Promise<AuthApiDocument> {
@@ -81,7 +78,7 @@ export class AuthApiService {
         return authApi.save();
     }
 
-    async create({ name, description }: AuthApiCreateDto): Promise<IAuthApi> {
+    async create({name, description}: AuthApiCreateDto): Promise<IAuthApi> {
         const key = await this.createKey();
         const secret = await this.createSecret();
         const passphrase = await this.createPassphrase();
@@ -109,13 +106,13 @@ export class AuthApiService {
     }
 
     async createRaw({
-        name,
-        description,
-        key,
-        secret,
-        passphrase,
-        encryptionKey,
-    }: AuthApiCreateRawDto): Promise<IAuthApi> {
+                        name,
+                        description,
+                        key,
+                        secret,
+                        passphrase,
+                        encryptionKey,
+                    }: AuthApiCreateRawDto): Promise<IAuthApi> {
         const hash: string = await this.createHashApiKey(key, secret);
 
         const create: AuthApiDocument = new this.authApiModel({
@@ -140,7 +137,7 @@ export class AuthApiService {
 
     async updateOneById(
         _id: string,
-        { name, description }: AuthApiUpdateDto
+        {name, description}: AuthApiUpdateDto
     ): Promise<AuthApiDocument> {
         const authApi: AuthApiDocument = await this.authApiModel.findById(_id);
 
@@ -229,7 +226,7 @@ export class AuthApiService {
             encryptionKey,
             passphrase
         );
-
+        console.log({decrypted});
         return JSON.parse(decrypted);
     }
 

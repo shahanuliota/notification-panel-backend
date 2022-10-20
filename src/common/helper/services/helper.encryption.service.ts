@@ -1,14 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { AES, enc, mode, pad } from 'crypto-js';
-import {
-    IHelperJwtOptions,
-    IHelperJwtVerifyOptions,
-} from '../helper.interface';
+import {Injectable} from '@nestjs/common';
+import {JwtService} from '@nestjs/jwt';
+import {AES, enc, mode, pad} from 'crypto-js';
+import {IHelperJwtOptions, IHelperJwtVerifyOptions,} from '../helper.interface';
 
 @Injectable()
 export class HelperEncryptionService {
-    constructor(private readonly jwtService: JwtService) {}
+    constructor(private readonly jwtService: JwtService) {
+    }
 
     base64Encrypt(data: string): string {
         const buff: Buffer = Buffer.from(data, 'utf8');

@@ -1,15 +1,15 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { RouterModule } from '@nestjs/core';
-import { Test } from '@nestjs/testing';
+import {HttpStatus, INestApplication} from '@nestjs/common';
+import {RouterModule} from '@nestjs/core';
+import {Test} from '@nestjs/testing';
 import request from 'supertest';
-import { faker } from '@faker-js/faker';
-import { useContainer } from 'class-validator';
-import { HelperDateService } from 'src/common/helper/services/helper.date.service';
-import { AuthApiService } from 'src/common/auth/services/auth.api.service';
-import { CommonModule } from 'src/common/common.module';
-import { RoutesModule } from '../../../src/router/routes/routes.module';
-import { E2E_AUTH_INFO_URL, E2E_AUTH_PAYLOAD_TEST } from './auth.constant';
-import { AuthService } from 'src/common/auth/services/auth.service';
+import {faker} from '@faker-js/faker';
+import {useContainer} from 'class-validator';
+import {HelperDateService} from 'src/common/helper/services/helper.date.service';
+import {AuthApiService} from 'src/common/auth/services/auth.api.service';
+import {CommonModule} from 'src/common/common.module';
+import {RoutesModule} from '../../../src/router/routes/routes.module';
+import {E2E_AUTH_INFO_URL, E2E_AUTH_PAYLOAD_TEST} from './auth.constant';
+import {AuthService} from 'src/common/auth/services/auth.service';
 
 describe('E2E Auth', () => {
     let app: INestApplication;
@@ -38,7 +38,7 @@ describe('E2E Auth', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
         helperDateService = app.get(HelperDateService);
         authApiService = app.get(AuthApiService);
         authService = app.get(AuthService);
@@ -61,6 +61,14 @@ describe('E2E Auth', () => {
             'cuwakimacojulawu'
         );
         xApiKey = `${apiKey}:${apiEncryption}`;
+
+        console.log({xApiKey});
+        console.log({
+            key: apiKey,
+            timestamp,
+
+            hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
+        });
 
         await app.init();
     });

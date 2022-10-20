@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post, Put, Query, Req} from "@nestjs/common";
 import {CreateApplicationDto} from "../dtos/create.application.dto";
 import {PaginationService} from "../../../common/pagination/services/pagination.service";
 import {ApplicationService} from "../services/application.service";
@@ -18,6 +18,10 @@ import {GetApplication} from "../decorators/application.decorator";
 import {ApplicationRequestDto} from "../dtos/application.request.dto";
 import {ApplicationGetGuard} from "../decorators/application.admin.decorator";
 import {ApplicationUpdateDto} from "../dtos/update.application.dto";
+import {AuthApiService} from "../../../common/auth/services/auth.api.service";
+import {IAuthApiRequestHashedData} from "../../../common/auth/auth.interface";
+import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
+import * as url from 'url';
 
 @Controller({
     version: '1',
@@ -26,7 +30,66 @@ import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 export class ApplicationController {
 
     constructor(private readonly paginationService: PaginationService,
-                private readonly applicationService: ApplicationService) {
+                private readonly applicationService: ApplicationService,
+                private readonly authApiService: AuthApiService,
+    ) {
+    }
+
+
+    @Get('/hello')
+    async hello() {
+        const apiKey = 'qwertyuiop12345zxcvbnmkjh';
+        const authApi: AuthApiDocument = await this.authApiService.findOneByKey(
+            apiKey
+        );
+        const apiEncryption = await this.authApiService.encryptApiKey(
+            {
+                key: apiKey,
+                timestamp: 1666240557875,
+                hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
+            },
+            authApi.encryptionKey,
+            authApi.passphrase
+        );
+        const xApiKey = `${apiKey}:${apiEncryption}`;
+        return {xApiKey, 'len': xApiKey.length};
+    }
+
+
+    @Get('/hello/decript')
+    async decript(@Query('apiKey') apiKey: string, @Req() req) {
+
+        const apiKey2 = req.headers['x-api-key'];
+        // let apiKey2 = req.query.apiKey;
+
+        const queryObject = url.parse(req.url, true).search;
+        // const queryObject = url.parse(req.url, true).search;
+        const params = new URLSearchParams(queryObject);
+        console.log({params});
+        console.log(queryObject, req.url);
+        // apiKey2 = queryObject.apiKey;
+        console.log({apiKey2});
+        console.log({apiKey});
+        console.log(apiKey2 == apiKey);
+        const xApiKey: string[] = apiKey2.split(':');
+        console.log({len: apiKey.length});
+
+        const encrypted = xApiKey[1];
+        const key = xApiKey[0];
+        const authApi: AuthApiDocument = await this.authApiService.findOneByKey(
+            key
+        );
+
+        console.log({authApi});
+        const decrypted: IAuthApiRequestHashedData =
+            await this.authApiService.decryptApiKey(
+                encrypted,
+                authApi.encryptionKey,
+                authApi.passphrase
+            );
+        return {decrypted};
+
+
     }
 
 
