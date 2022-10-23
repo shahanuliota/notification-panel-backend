@@ -226,7 +226,7 @@ export class AuthApiService {
             encryptionKey,
             passphrase
         );
-        console.log({decrypted});
+        // console.log({decrypted});
         return JSON.parse(decrypted);
     }
 

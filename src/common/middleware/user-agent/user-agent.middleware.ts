@@ -59,10 +59,10 @@ export class UserAgentMiddleware implements NestMiddleware {
                     message: 'middleware.error.userAgentBrowserInvalid',
                 });
             }
-            console.log({useragent: req.headers['user-agent']});
+            //  console.log({useragent: req.headers['user-agent']});
 
             req.userAgent = userAgentParser;
-            console.log({useragent: req.userAgent});
+            //console.log({useragent: req.userAgent});
         }
         next();
     }

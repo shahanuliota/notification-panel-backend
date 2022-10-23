@@ -34,6 +34,8 @@ export class HelperEncryptionService {
             iv: cIv,
         });
 
+        console.log({enc: cipher.toString()});
+
         return cipher.toString();
     }
 

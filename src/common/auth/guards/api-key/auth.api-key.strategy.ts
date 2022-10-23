@@ -40,7 +40,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
         ) => Promise<void>,
         req: any
     ) {
-        console.log({apiKey});
+
         const xApiKey: string[] = apiKey.split(':');
         const key = xApiKey[0];
         const encrypted = xApiKey[1];
@@ -69,7 +69,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
                     authApi.encryptionKey,
                     authApi.passphrase
                 );
-            // console.log({"decrypted_api": decrypted});
+       
 
             const hasKey: boolean =
                 'key' in decrypted &&
