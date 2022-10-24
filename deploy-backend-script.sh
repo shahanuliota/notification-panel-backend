@@ -2,8 +2,9 @@
 echo "================================"
 docker ps
 docker stop notification-panel-backend
-docker rm shawon1fb/notification-panel-backend
-docker run -p 3000:3000 notification-panel-backend -e APP_NAME=notification-panel\
+docker rm notification-panel-backend
+docker rmi shawon1fb/notification-panel-backend
+docker run -p 3000:3000 --name notification-panel-backend -e APP_NAME=notification-panel\
                              -e APP_ENV=development\
                              -e APP_MODE=simple\
                              -e APP_LANGUAGE=en\
