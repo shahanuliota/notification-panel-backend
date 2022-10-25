@@ -18,7 +18,7 @@ export class ResponseCustomHeadersInterceptor
                     const ctx: HttpArgumentsHost = context.switchToHttp();
                     const responseExpress: Response = ctx.getResponse();
                     const request: IRequestApp = ctx.getRequest();
-                    console.log(responseExpress.get('Content-Type'));
+                    // console.log(responseExpress.get('Content-Type'));
 
                     if (responseExpress.get('Content-Type') === 'text/event-stream') {
                         return response;

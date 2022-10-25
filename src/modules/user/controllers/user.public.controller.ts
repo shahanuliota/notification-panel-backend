@@ -5,7 +5,6 @@ import {
     InternalServerErrorException,
     NotFoundException,
     Post,
-    Sse,
 } from '@nestjs/common';
 import {AuthService} from 'src/common/auth/services/auth.service';
 import {ENUM_ERROR_STATUS_CODE_ERROR} from 'src/common/error/constants/error.status-code.constant';
@@ -19,8 +18,6 @@ import {UserSignUpDto} from '../dtos/user.sign-up.dto';
 import {UserPayloadSerialization} from '../serializations/user.payload.serialization';
 import {UserService} from '../services/user.service';
 import {IUserCheckExist, IUserDocument} from '../user.interface';
-import {interval, Observable} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Controller({
     version: '1',
@@ -134,25 +131,5 @@ export class UserPublicController {
         }
     }
 
-    // @Sse('sse')
-    // sse(): Observable<string> {
-    //     const buttonPressesLogFile = `logs/http/2022-10-16.log`;
-    //     // return new Observable((subscriber) => {
-    //     //     fs.watchFile(buttonPressesLogFile, (curr, prev) => {
-    //     //         console.log(`${buttonPressesLogFile} file Changed`);
-    //     //         const data = fs.readFileSync(buttonPressesLogFile, "utf8");
-    //     //         // console.log(data);
-    //     //         subscriber.next({data: {hello: 'world'}});
-    //     //     });
-    //     // });
-    //
-    //     // return interval(5000).pipe(map((_) => ({data: {hello: fs.readFileSync(buttonPressesLogFile, "utf8")}})));
-    //
-    //     return interval(1000).pipe(map((_) => ('ok')));
-    // }
 
-    @Sse('sse')
-    sse(): Observable<any> {
-        return interval(1000).pipe(map((_) => ({data: {hello: 'world'}})));
-    }
 }
