@@ -122,16 +122,25 @@ export class ErrorHttpFilter implements ExceptionFilter {
             data,
         };
 
-        console.log({reqCustomLang});
+        console.log({
+            reqCustomLang,
+            __timestamp,
+            __timezone,
+            __requestId,
+            __version,
+            __repoVersion,
+            statusHttp,
+            resResponse
+        });
         responseExpress
             .setHeader('x-custom-lang', reqCustomLang || 'en')
-            .setHeader('x-timestamp', __timestamp)
-            .setHeader('x-timezone', __timezone)
-            .setHeader('x-request-id', __requestId)
-            .setHeader('x-version', __version)
-            .setHeader('x-repo-version', __repoVersion)
-            .status(statusHttp)
-            .json(resResponse);
+            .setHeader('x-timestamp', __timestamp || '0')
+            .setHeader('x-timezone', __timezone || 'dhaka')
+            .setHeader('x-request-id', __requestId || '')
+            .setHeader('x-version', __version || '0')
+            .setHeader('x-repo-version', __repoVersion || '0')
+            .status(statusHttp || 400)
+            .json(resResponse || {});
 
         return;
     }
