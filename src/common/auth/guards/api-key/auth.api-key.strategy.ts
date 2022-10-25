@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
+import {Injectable} from '@nestjs/common';
+import {PassportStrategy} from '@nestjs/passport';
 import Strategy from 'passport-headerapikey';
-import { HelperNumberService } from 'src/common/helper/services/helper.number.service';
-import { IRequestApp } from 'src/common/request/request.interface';
-import { IAuthApiRequestHashedData } from '../../auth.interface';
-import { ENUM_AUTH_STATUS_CODE_ERROR } from '../../constants/auth.status-code.constant';
-import { AuthApiDocument } from '../../schemas/auth.api.schema';
-import { AuthApiService } from '../../services/auth.api.service';
+import {HelperNumberService} from 'src/common/helper/services/helper.number.service';
+import {IRequestApp} from 'src/common/request/request.interface';
+import {IAuthApiRequestHashedData} from '../../auth.interface';
+import {ENUM_AUTH_STATUS_CODE_ERROR} from '../../constants/auth.status-code.constant';
+import {AuthApiDocument} from '../../schemas/auth.api.schema';
+import {AuthApiService} from '../../services/auth.api.service';
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
@@ -15,7 +15,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
         private readonly helperNumberService: HelperNumberService
     ) {
         super(
-            { header: 'X-API-KEY', prefix: '' },
+            {header: 'X-API-KEY', prefix: ''},
             true,
             async (
                 apiKey: string,
@@ -40,6 +40,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
         ) => Promise<void>,
         req: any
     ) {
+
         const xApiKey: string[] = apiKey.split(':');
         const key = xApiKey[0];
         const encrypted = xApiKey[1];
@@ -61,12 +62,14 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
                 `${ENUM_AUTH_STATUS_CODE_ERROR.AUTH_API_KEY_INACTIVE_ERROR}`
             );
         } else {
+
             const decrypted: IAuthApiRequestHashedData =
                 await this.authApiService.decryptApiKey(
                     encrypted,
                     authApi.encryptionKey,
                     authApi.passphrase
                 );
+       
 
             const hasKey: boolean =
                 'key' in decrypted &&

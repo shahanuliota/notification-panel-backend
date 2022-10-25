@@ -1,8 +1,12 @@
 #!/bin/bash
 echo "================================"
+docker ps
+docker stop notification-panel-backend
+docker rm notification-panel-backend
+docker rmi shawon1fb/notification-panel-backend
 docker run -p 3000:3000 --name notification-panel-backend -e APP_NAME=notification-panel\
                              -e APP_ENV=development\
-                             -e APP_MODE=simple\
+                             -e APP_MODE=secure\
                              -e APP_LANGUAGE=en\
                              -e APP_TZ=Asia/Jakarta\
                              -e APP_HOST=0.0.0.0\
@@ -18,7 +22,7 @@ docker run -p 3000:3000 --name notification-panel-backend -e APP_NAME=notificati
                              -e DATABASE_PASSWORD=ddz5vPPwbvzCHwE\
                              -e DATABASE_DEBUG=false\
                              -e DATABASE_OPTIONS="retryWrites=true&w=majority"\
-                             -e MIDDLEWARE_TOLERANCE_TIMESTAMP=5m\
+                             -e MIDDLEWARE_TOLERANCE_TIMESTAMP=5s\
                              -e MIDDLEWARE_TIMEOUT=30s\
                              -e AUTH_JWT_AUDIENCE=https://iotait.com\
                              -e AUTH_JWT_ISSUER=iotait\
@@ -30,10 +34,10 @@ docker run -p 3000:3000 --name notification-panel-backend -e APP_NAME=notificati
                              -e AUTH_JWT_REFRESH_TOKEN_NOT_BEFORE_EXPIRATION=30m\
                              -e AUTH_BASIC_TOKEN_CLIENT_ID=grdews\
                              -e AUTH_BASIC_TOKEN_CLIENT_SECRET=1234567890\
-                             -e AWS_CREDENTIAL_KEY=AKIARZ46GSMDNJ32VYSF\
-                             -e AWS_CREDENTIAL_SECRET=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\
-                             -e AWS_S3_REGION=us-east-1\
-                             -e AWS_S3_BUCKET=iota-notification-panel-bucket0001\
+                             -e AWS_CREDENTIAL_KEY=AKIASKLI3FAAWUPRMUFA\
+                             -e AWS_CREDENTIAL_SECRET=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\
+                             -e AWS_S3_REGION=ap-southeast-1\
+                             -e AWS_S3_BUCKET=sportsimage\
                               \
                               shawon1fb/notification-panel-backend
 echo "================================"
