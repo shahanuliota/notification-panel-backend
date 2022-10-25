@@ -122,6 +122,7 @@ export class ErrorHttpFilter implements ExceptionFilter {
             data,
         };
 
+        console.log({reqCustomLang});
         responseExpress
             .setHeader('x-custom-lang', reqCustomLang)
             .setHeader('x-timestamp', __timestamp)
