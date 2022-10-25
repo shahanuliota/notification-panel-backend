@@ -59,7 +59,7 @@ export class UserController {
     @AuthJwtGuard()
     @Get('/profile')
     async profile(@GetUser() user: IUserDocument): Promise<IResponse> {
-       
+
         return user;
     }
 
@@ -165,6 +165,7 @@ export class UserController {
     @Post('/login')
 
     async login(@Body() body: UserLoginDto): Promise<IResponse> {
+        console.log({body});
         const user: IUserDocument =
             await this.userService.findOne<IUserDocument>(
                 {

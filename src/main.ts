@@ -16,6 +16,8 @@ async function bootstrap() {
     const versioningPrefix: string = configService.get<string>(
         'app.versioning.prefix'
     );
+ 
+
     const version: string = configService.get<string>('app.version');
 
     const logger = new Logger();
