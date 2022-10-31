@@ -133,12 +133,12 @@ export class ErrorHttpFilter implements ExceptionFilter {
             resResponse
         });
         responseExpress
-            .setHeader('x-custom-lang', reqCustomLang || 'en')
-            .setHeader('x-timestamp', __timestamp || '0')
-            .setHeader('x-timezone', __timezone || 'dhaka')
-            .setHeader('x-request-id', __requestId || '')
-            .setHeader('x-version', __version || '0')
-            .setHeader('x-repo-version', __repoVersion || '0')
+            .setHeader('x-custom-lang', reqCustomLang)
+            .setHeader('x-timestamp', __timestamp)
+            .setHeader('x-timezone', __timezone)
+            .setHeader('x-request-id', __requestId)
+            .setHeader('x-version', __version)
+            .setHeader('x-repo-version', __repoVersion)
             .status(statusHttp || 400)
             .json(resResponse || {});
 

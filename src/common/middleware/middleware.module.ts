@@ -1,31 +1,23 @@
-import {
-    Module,
-    NestModule,
-    MiddlewareConsumer,
-    RequestMethod,
-} from '@nestjs/common';
-import { CorsMiddleware } from './cors/cors.middleware';
+import {MiddlewareConsumer, Module, NestModule, RequestMethod,} from '@nestjs/common';
+import {CorsMiddleware} from './cors/cors.middleware';
 import {
     JsonBodyParserMiddleware,
     RawBodyParserMiddleware,
     TextBodyParserMiddleware,
     UrlencodedBodyParserMiddleware,
 } from './body-parser/body-parser.middleware';
-import {
-    HttpDebuggerMiddleware,
-    HttpDebuggerResponseMiddleware,
-} from './http-debugger/http-debugger.middleware';
-import { HelmetMiddleware } from './helmet/helmet.middleware';
-import { RateLimitMiddleware } from './rate-limit/rate-limit.middleware';
-import { UserAgentMiddleware } from './user-agent/user-agent.middleware';
-import { CompressionMiddleware } from './compression/compression.middleware';
-import { MaintenanceMiddleware } from './maintenance/maintenance.middleware';
-import { RequestIdMiddleware } from './request-id/request-id.middleware';
-import { TimezoneMiddleware } from './timezone/timezone.middleware';
-import { ResponseTimeMiddleware } from './response-time/response-time.middleware';
-import { TimestampMiddleware } from './timestamp/timestamp.middleware';
-import { ValidateCustomLanguageMiddleware } from './validate-custom-language/validate-custom-language.middleware';
-import { VersionMiddleware } from './version/version.middleware';
+import {HttpDebuggerMiddleware, HttpDebuggerResponseMiddleware,} from './http-debugger/http-debugger.middleware';
+import {HelmetMiddleware} from './helmet/helmet.middleware';
+import {RateLimitMiddleware} from './rate-limit/rate-limit.middleware';
+import {UserAgentMiddleware} from './user-agent/user-agent.middleware';
+import {CompressionMiddleware} from './compression/compression.middleware';
+import {MaintenanceMiddleware} from './maintenance/maintenance.middleware';
+import {RequestIdMiddleware} from './request-id/request-id.middleware';
+import {TimezoneMiddleware} from './timezone/timezone.middleware';
+import {ResponseTimeMiddleware} from './response-time/response-time.middleware';
+import {TimestampMiddleware} from './timestamp/timestamp.middleware';
+import {ValidateCustomLanguageMiddleware} from './validate-custom-language/validate-custom-language.middleware';
+import {VersionMiddleware} from './version/version.middleware';
 
 @Module({})
 export class MiddlewareModule implements NestModule {
@@ -44,11 +36,11 @@ export class MiddlewareModule implements NestModule {
                 HttpDebuggerMiddleware,
                 HelmetMiddleware,
                 RateLimitMiddleware,
-                UserAgentMiddleware,
                 ValidateCustomLanguageMiddleware,
                 ResponseTimeMiddleware,
                 TimestampMiddleware,
-                VersionMiddleware
+                VersionMiddleware,
+                UserAgentMiddleware,
             )
             .forRoutes('*');
 

@@ -1,6 +1,6 @@
-import { registerAs } from '@nestjs/config';
+import {registerAs} from '@nestjs/config';
 import ms from 'ms';
-import { ENUM_REQUEST_METHOD } from 'src/common/request/constants/request.enum.constant';
+import {ENUM_REQUEST_METHOD} from 'src/common/request/constants/request.enum.constant';
 
 export default registerAs(
     'middleware',
@@ -82,6 +82,7 @@ export default registerAs(
                 'Firefox',
                 'Samsung Browser',
                 'UCBrowser',
+                // 'Mobile Safari',
             ],
         },
     })
