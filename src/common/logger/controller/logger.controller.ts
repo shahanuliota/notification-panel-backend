@@ -1,7 +1,9 @@
-import {Controller, Get, Res, StreamableFile} from '@nestjs/common';
-import {createReadStream} from 'fs';
+import {Controller, Get, Param, Res, StreamableFile} from '@nestjs/common';
+import {createReadStream, readdirSync, statSync} from 'fs';
 import {join} from 'path';
 import type {Response} from 'express';
+import {RequestParamGuard} from "../../request/decorators/request.decorator";
+import {FileRequestDto} from "../dto/file.request.dto";
 
 @Controller({
     version: '1',
@@ -9,14 +11,47 @@ import type {Response} from 'express';
 })
 export class LoggerController {
 
-    @Get()
-    getFile(@Res({passthrough: true}) res: Response): StreamableFile {
-        const file = createReadStream(join(process.cwd(), 'logs/http/2022-10-24.log'));
+    @RequestParamGuard(FileRequestDto)
+    @Get('log/http/:name')
+    getFile(@Res({passthrough: true}) res: Response, @Param('name') filename: string): StreamableFile {
+
+        console.log({filename});
+        const file = createReadStream(join(process.cwd(), 'logs/http/2022-10-31.log'));
         res.set({
             'Content-Type': 'application/json',
             'Content-Disposition': 'attachment; filename="2022-10-24.log"',
         });
         return new StreamableFile(file);
+    }
+
+
+    @Get('/files')
+    fileName() {
+
+
+        const getAllFiles = (dirPath, arrayOfFiles) => {
+            const files = readdirSync(dirPath);
+
+            arrayOfFiles = arrayOfFiles || {};
+            const fileList = [];
+
+            files.forEach(function (file) {
+                if (statSync(dirPath + "/" + file).isDirectory()) {
+                    arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+                } else {
+                    if (file.endsWith('.log')) {
+                        fileList.push(file);
+                    }
+                }
+            });
+            if (fileList.length !== 0) {
+                arrayOfFiles[dirPath] = fileList;
+            }
+
+            return arrayOfFiles;
+        };
+        const result = getAllFiles("logs", {});
+        return {"ok": result};
     }
 
 }

@@ -37,6 +37,7 @@ export class UserAgentMiddleware implements NestMiddleware {
                 req.headers['user-agent']
             );
 
+            console.log({userAgentParser});
             if (
                 !os.some((val) =>
                     val.match(new RegExp(userAgentParser.os.name))
