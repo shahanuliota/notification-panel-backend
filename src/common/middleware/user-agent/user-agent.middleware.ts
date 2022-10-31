@@ -23,6 +23,8 @@ export class UserAgentMiddleware implements NestMiddleware {
         if (mode === 'secure') {
             // Put your specific user agent
             const userAgent: string = req.headers['user-agent'] as string;
+
+            console.log({userAgent});
             if (!userAgent) {
                 throw new ForbiddenException({
                     statusCode:
@@ -46,23 +48,27 @@ export class UserAgentMiddleware implements NestMiddleware {
                     message: 'middleware.error.userAgentOsInvalid',
                 });
             }
-
+            console.log({browser});
+            console.log({userAgentParser: userAgentParser.browser.name});
+            console.log({rex: new RegExp(userAgentParser.browser.name)});
 
             if (
                 !browser.some((val) =>
                     val.match(new RegExp(userAgentParser.browser.name))
                 )
             ) {
+
+
                 throw new ForbiddenException({
                     statusCode:
                     ENUM_REQUEST_STATUS_CODE_ERROR.REQUEST_USER_AGENT_BROWSER_INVALID_ERROR,
                     message: 'middleware.error.userAgentBrowserInvalid',
                 });
             }
-            //  console.log({useragent: req.headers['user-agent']});
+
 
             req.userAgent = userAgentParser;
-            //console.log({useragent: req.userAgent});
+
         }
         next();
     }
