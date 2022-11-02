@@ -1,0 +1,14 @@
+{
+  "list": "Logger list succeed",
+  "get": "Logger get succeed",
+  "create": "Logger creation succeed",
+  "update": "Logger update succeed",
+  "active": "Logger active succeed",
+  "inactive": "Logger inactive succeed",
+  "delete": "Logger delete succeed",
+  "error": {
+    "notFound": "Logger not found",
+    "active": "Logger active status invalid",
+    "exist": "Logger already exist"
+  }
+}
