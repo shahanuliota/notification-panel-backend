@@ -34,7 +34,7 @@ export class LoggerController {
         const getAllFiles = (dirPath, arrayOfFiles) => {
             const files = readdirSync(dirPath);
 
-            arrayOfFiles = arrayOfFiles || {};
+            arrayOfFiles = arrayOfFiles || [];
             const fileList = [];
 
             files.forEach(function (file) {
@@ -42,17 +42,18 @@ export class LoggerController {
                     arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
                 } else {
                     if (file.endsWith('.log')) {
-                        fileList.push(file);
+                        fileList.push(dirPath + "/" + file);
                     }
                 }
             });
             if (fileList.length !== 0) {
-                arrayOfFiles[dirPath] = fileList;
+                // arrayOfFiles[dirPath] = fileList;
+                arrayOfFiles.push(...fileList);
             }
 
             return arrayOfFiles;
         };
-        const result = getAllFiles("logs", {});
+        const result = getAllFiles("logs", []);
         return {"logger": result};
     }
 
