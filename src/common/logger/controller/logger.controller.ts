@@ -18,7 +18,7 @@ export class LoggerController {
     getFile(@Res({passthrough: true}) res: ex.Response, @Param('name') filename: string): StreamableFile {
 
         console.log({filename});
-        const file = createReadStream(join(process.cwd(), 'logs/http/2022-10-31.log'));
+        const file = createReadStream(join(process.cwd(), 'logs/http/2022-11-06.log'));
         res.set({
             'Content-Type': 'application/json',
             'Content-Disposition': 'attachment; filename="2022-10-24.log"',

@@ -1,18 +1,11 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {Injectable, NestMiddleware} from '@nestjs/common';
 import morgan from 'morgan';
-import { Request, Response, NextFunction } from 'express';
-import { createStream } from 'rotating-file-stream';
-import { ConfigService } from '@nestjs/config';
-import {
-    ICustomResponse,
-    IHttpDebuggerConfig,
-    IHttpDebuggerConfigOptions,
-} from './http-debugger.interface';
-import { HelperDateService } from 'src/common/helper/services/helper.date.service';
-import {
-    DEBUGGER_HTTP_FORMAT,
-    DEBUGGER_HTTP_NAME,
-} from './constants/http-debugger.constant';
+import {NextFunction, Request, Response} from 'express';
+import {createStream} from 'rotating-file-stream';
+import {ConfigService} from '@nestjs/config';
+import {ICustomResponse, IHttpDebuggerConfig, IHttpDebuggerConfigOptions,} from './http-debugger.interface';
+import {HelperDateService} from 'src/common/helper/services/helper.date.service';
+import {DEBUGGER_HTTP_FORMAT, DEBUGGER_HTTP_NAME,} from './constants/http-debugger.constant';
 
 @Injectable()
 export class HttpDebuggerMiddleware implements NestMiddleware {
@@ -31,6 +24,16 @@ export class HttpDebuggerMiddleware implements NestMiddleware {
         );
     }
 
+    async use(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const config: IHttpDebuggerConfig = await this.httpLogger();
+        this.customToken();
+        morgan(config.debuggerHttpFormat, config.HttpDebuggerOptions)(
+            req,
+            res,
+            next
+        );
+    }
+
     private customToken(): void {
         morgan.token('req-params', (req: Request) =>
             JSON.stringify(req.params)
@@ -45,6 +48,9 @@ export class HttpDebuggerMiddleware implements NestMiddleware {
 
         morgan.token('req-headers', (req: Request) =>
             JSON.stringify(req.headers)
+        );
+        morgan.token('req-id', (req: Request) =>
+            `${req.headers['x-request-id']}`
         );
     }
 
@@ -66,16 +72,6 @@ export class HttpDebuggerMiddleware implements NestMiddleware {
             debuggerHttpFormat: DEBUGGER_HTTP_FORMAT,
             HttpDebuggerOptions,
         };
-    }
-
-    async use(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const config: IHttpDebuggerConfig = await this.httpLogger();
-        this.customToken();
-        morgan(config.debuggerHttpFormat, config.HttpDebuggerOptions)(
-            req,
-            res,
-            next
-        );
     }
 }
 
