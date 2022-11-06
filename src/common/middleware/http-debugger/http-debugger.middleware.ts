@@ -49,8 +49,10 @@ export class HttpDebuggerMiddleware implements NestMiddleware {
         morgan.token('req-headers', (req: Request) =>
             JSON.stringify(req.headers)
         );
-        morgan.token('req-id', (req: Request) =>
-            `${req.headers['x-request-id']}`
+        morgan.token('req-id', (req: Request) => {
+                console.log(req);
+                return `${req.headers['x-request-id']}`;
+            }
         );
     }
 
