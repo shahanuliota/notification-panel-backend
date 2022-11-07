@@ -1,9 +1,11 @@
 import {Controller, Get, Param, Res, StreamableFile} from '@nestjs/common';
 import {createReadStream, readdirSync, statSync} from 'fs';
 import {join} from 'path';
-import type {Response} from 'express';
+import * as ex from 'express';
 import {RequestParamGuard} from "../../request/decorators/request.decorator";
 import {FileRequestDto} from "../dto/file.request.dto";
+
+import {Response} from 'src/common/response/decorators/response.decorator';
 
 @Controller({
     version: '1',
@@ -13,10 +15,10 @@ export class LoggerController {
 
     @RequestParamGuard(FileRequestDto)
     @Get('log/http/:name')
-    getFile(@Res({passthrough: true}) res: Response, @Param('name') filename: string): StreamableFile {
+    getFile(@Res({passthrough: true}) res: ex.Response, @Param('name') filename: string): StreamableFile {
 
         console.log({filename});
-        const file = createReadStream(join(process.cwd(), 'logs/http/2022-10-31.log'));
+        const file = createReadStream(join(process.cwd(), `logs/http/${filename}`));
         res.set({
             'Content-Type': 'application/json',
             'Content-Disposition': 'attachment; filename="2022-10-24.log"',
@@ -24,7 +26,7 @@ export class LoggerController {
         return new StreamableFile(file);
     }
 
-
+    @Response('logger.get')
     @Get('/files')
     fileName() {
 
@@ -32,7 +34,7 @@ export class LoggerController {
         const getAllFiles = (dirPath, arrayOfFiles) => {
             const files = readdirSync(dirPath);
 
-            arrayOfFiles = arrayOfFiles || {};
+            arrayOfFiles = arrayOfFiles || [];
             const fileList = [];
 
             files.forEach(function (file) {
@@ -40,18 +42,19 @@ export class LoggerController {
                     arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
                 } else {
                     if (file.endsWith('.log')) {
-                        fileList.push(file);
+                        fileList.push(dirPath + "/" + file);
                     }
                 }
             });
             if (fileList.length !== 0) {
-                arrayOfFiles[dirPath] = fileList;
+                // arrayOfFiles[dirPath] = fileList;
+                arrayOfFiles.push(...fileList);
             }
 
             return arrayOfFiles;
         };
-        const result = getAllFiles("logs", {});
-        return {"ok": result};
+        const result = getAllFiles("logs/http", []);
+        return {"logger": result};
     }
 
 }
