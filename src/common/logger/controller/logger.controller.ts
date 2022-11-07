@@ -18,7 +18,7 @@ export class LoggerController {
     getFile(@Res({passthrough: true}) res: ex.Response, @Param('name') filename: string): StreamableFile {
 
         console.log({filename});
-        const file = createReadStream(join(process.cwd(), 'logs/http/2022-11-06.log'));
+        const file = createReadStream(join(process.cwd(), `logs/http/${filename}`));
         res.set({
             'Content-Type': 'application/json',
             'Content-Disposition': 'attachment; filename="2022-10-24.log"',
@@ -53,7 +53,7 @@ export class LoggerController {
 
             return arrayOfFiles;
         };
-        const result = getAllFiles("logs", []);
+        const result = getAllFiles("logs/http", []);
         return {"logger": result};
     }
 
