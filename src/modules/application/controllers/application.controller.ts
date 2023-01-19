@@ -24,6 +24,9 @@ import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
 import {TaskScheduleDto} from "../dtos/task.schedule.dto";
 import {ScheduleService} from "../services/schedule.service";
 import {TaskScheduleDocument} from "../schemas/task_schedule.schema";
+import {TaskScheduleRequestDto} from "../dtos/task.schedule.request.dto";
+import {TaskScheduleGetGuard} from "../decorators/task.schedule.decorator";
+import {GetTaskSchedule} from "../decorators/task-schedule.get.decorator";
 
 @Controller({
     version: '1',
@@ -202,9 +205,7 @@ export class ApplicationController {
         return await this.applicationService.removeGroup(app._id, dto);
     }
 
-    @Response('schedule.create',)
-    // @ApplicationGetGuard()
-    // @RequestParamGuard(TaskScheduleDto)
+    @Response('schedule.create')
     @UserProfileGuard()
     @AuthAdminJwtGuard()
     @Post('/schedule')
@@ -212,7 +213,7 @@ export class ApplicationController {
         return this.taskScheduleService.create(dto, dto.name, user);
     }
 
-    @ResponsePaging('schedule.list',)
+    @ResponsePaging('schedule.list')
     @UserProfileGuard()
     @AuthAdminJwtGuard()
     @Get('/schedule/list')
@@ -238,6 +239,16 @@ export class ApplicationController {
         return {
             data: ojb
         };
+    }
+
+    @Response('schedule.delete')
+    @TaskScheduleGetGuard()
+    @RequestParamGuard(TaskScheduleRequestDto)
+    @AuthAdminJwtGuard()
+    @Delete('/schedule/delete/:task')
+    async scheduledDelete(@GetTaskSchedule() task: TaskScheduleDocument) {
+        return this.taskScheduleService.deleteOne({_id: task._id});
+
     }
 
 
