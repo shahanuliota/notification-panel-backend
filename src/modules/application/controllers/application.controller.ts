@@ -22,6 +22,7 @@ import {AuthApiService} from "../../../common/auth/services/auth.api.service";
 import {IAuthApiRequestHashedData} from "../../../common/auth/auth.interface";
 import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
 import {TaskScheduleDto} from "../dtos/task.schedule.dto";
+import {ScheduleService} from "../services/schedule.service";
 
 @Controller({
     version: '1',
@@ -32,6 +33,7 @@ export class ApplicationController {
     constructor(private readonly paginationService: PaginationService,
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
+                private readonly taskScheduleService: ScheduleService
     ) {
     }
 
@@ -199,13 +201,13 @@ export class ApplicationController {
         return await this.applicationService.removeGroup(app._id, dto);
     }
 
-    // @Response('application.update')
+    @Response('schedule.create',)
     // @ApplicationGetGuard()
     // @RequestParamGuard(TaskScheduleDto)
     @AuthAdminJwtGuard()
     @Post('/schedule')
     async scheduleNotification(@Body() dto: TaskScheduleDto) {
-        return {...dto};
+        return this.taskScheduleService.create(dto, 'application_schedule');
     }
 
 
