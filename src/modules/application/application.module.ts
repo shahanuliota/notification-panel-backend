@@ -5,6 +5,7 @@ import {ApplicationDatabaseName, ApplicationEntity, ApplicationSchema} from "./s
 import {ApplicationService} from "./services/application.service";
 import {TaskScheduleDatabaseName, TaskScheduleEntity, TaskScheduleSchema} from "./schemas/task_schedule.schema";
 import {ScheduleService} from "./services/schedule.service";
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import {ScheduleService} from "./services/schedule.service";
             ],
             DATABASE_CONNECTION_NAME
         ),
+        HttpModule,
     ],
 
     providers: [ApplicationService, ScheduleService],

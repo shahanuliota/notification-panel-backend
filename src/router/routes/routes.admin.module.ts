@@ -12,6 +12,7 @@ import {AppGroutController} from "../../modules/group/controllers/group.controll
 import {ApplicationModule} from "../../modules/application/application.module";
 import {ApplicationController} from "../../modules/application/controllers/application.controller";
 import {ScheduleModule} from "@nestjs/schedule";
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
     controllers: [
@@ -24,7 +25,7 @@ import {ScheduleModule} from "@nestjs/schedule";
     ],
     providers: [],
     exports: [],
-    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule, ApplicationModule, ScheduleModule.forRoot()
+    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule, ApplicationModule, ScheduleModule.forRoot(), HttpModule
     ],
 })
 export class RoutesAdminModule {
