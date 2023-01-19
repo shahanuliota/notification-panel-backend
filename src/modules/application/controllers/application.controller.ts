@@ -204,10 +204,19 @@ export class ApplicationController {
     @Response('schedule.create',)
     // @ApplicationGetGuard()
     // @RequestParamGuard(TaskScheduleDto)
+    @UserProfileGuard()
     @AuthAdminJwtGuard()
     @Post('/schedule')
-    async scheduleNotification(@Body() dto: TaskScheduleDto) {
-        return this.taskScheduleService.create(dto, 'application_schedule');
+    async scheduleNotification(@Body() dto: TaskScheduleDto, @GetUser() user: IUserDocument) {
+        console.log({user});
+        return this.taskScheduleService.create(dto, 'application_schedule', user);
+    }
+
+    @Response('schedule.list',)
+    @AuthAdminJwtGuard()
+    @Get('/schedule/list')
+    async getScheduledList() {
+        return '';
     }
 
 

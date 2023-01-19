@@ -1,5 +1,6 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {Document} from 'mongoose';
+import {Document, Types} from 'mongoose';
+import {UserEntity} from "../../user/schemas/user.schema";
 
 @Schema({timestamps: true, versionKey: false})
 export class TaskScheduleEntity {
@@ -23,6 +24,13 @@ export class TaskScheduleEntity {
 
     })
     schedule: Date;
+
+    @Prop({
+        required: true,
+        type: Types.ObjectId,
+        ref: UserEntity.name,
+    })
+    owner: Types.ObjectId;
 }
 
 export const TaskScheduleDatabaseName = 'task_schedule';
