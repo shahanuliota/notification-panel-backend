@@ -7,6 +7,8 @@ export class TaskScheduleDto {
     @IsString()
     @IsJSON()
     applications: string;
+    @IsString()
+    name: string;
 
     @IsDate()
     @Type(() => Date)

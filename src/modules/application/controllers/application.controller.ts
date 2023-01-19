@@ -209,7 +209,7 @@ export class ApplicationController {
     @AuthAdminJwtGuard()
     @Post('/schedule')
     async scheduleNotification(@Body() dto: TaskScheduleDto, @GetUser() user: IUserDocument) {
-        return this.taskScheduleService.create(dto, 'application_schedule', user);
+        return this.taskScheduleService.create(dto, dto.name, user);
     }
 
     @ResponsePaging('schedule.list',)
@@ -221,8 +221,22 @@ export class ApplicationController {
             owner: user._id,
         };
         const tasks: TaskScheduleDocument[] = await this.taskScheduleService.findAll<TaskScheduleDocument>(find);
+        const ojb = [];
+
+        for (const t of tasks) {
+            const o = {
+                id: t._id,
+                name: t.name,
+                schedule: t.schedule,
+                createdAt: t['createdAt'],
+                updatedAt: t['updatedAt'],
+                applications: JSON.parse(t.task),
+            };
+            ojb.push(o);
+        }
+
         return {
-            data: tasks
+            data: ojb
         };
     }
 
