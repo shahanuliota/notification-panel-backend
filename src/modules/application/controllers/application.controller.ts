@@ -23,6 +23,7 @@ import {IAuthApiRequestHashedData} from "../../../common/auth/auth.interface";
 import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
 import {TaskScheduleDto} from "../dtos/task.schedule.dto";
 import {ScheduleService} from "../services/schedule.service";
+import {TaskScheduleDocument} from "../schemas/task_schedule.schema";
 
 @Controller({
     version: '1',
@@ -208,15 +209,21 @@ export class ApplicationController {
     @AuthAdminJwtGuard()
     @Post('/schedule')
     async scheduleNotification(@Body() dto: TaskScheduleDto, @GetUser() user: IUserDocument) {
-        console.log({user});
         return this.taskScheduleService.create(dto, 'application_schedule', user);
     }
 
-    @Response('schedule.list',)
+    @ResponsePaging('schedule.list',)
+    @UserProfileGuard()
     @AuthAdminJwtGuard()
     @Get('/schedule/list')
-    async getScheduledList() {
-        return '';
+    async getScheduledList(@GetUser() user: IUserDocument) {
+        const find: Record<string, any> = {
+            owner: user._id,
+        };
+        const tasks: TaskScheduleDocument[] = await this.taskScheduleService.findAll<TaskScheduleDocument>(find);
+        return {
+            data: tasks
+        };
     }
 
 
