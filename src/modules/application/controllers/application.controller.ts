@@ -27,6 +27,8 @@ import {TaskScheduleDocument} from "../schemas/task_schedule.schema";
 import {TaskScheduleRequestDto} from "../dtos/task.schedule.request.dto";
 import {TaskScheduleGetGuard} from "../decorators/task.schedule.decorator";
 import {GetTaskSchedule} from "../decorators/task-schedule.get.decorator";
+import {HttpService} from "@nestjs/axios";
+import {Cron, CronExpression} from "@nestjs/schedule";
 
 @Controller({
     version: '1',
@@ -37,7 +39,8 @@ export class ApplicationController {
     constructor(private readonly paginationService: PaginationService,
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
-                private readonly taskScheduleService: ScheduleService
+                private readonly taskScheduleService: ScheduleService,
+                private readonly httpService: HttpService
     ) {
     }
 
@@ -248,8 +251,78 @@ export class ApplicationController {
     @Delete('/schedule/delete/:task')
     async scheduledDelete(@GetTaskSchedule() task: TaskScheduleDocument) {
         return this.taskScheduleService.deleteOne({_id: task._id});
-
     }
 
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    // @Get('/schedule/test')
+    async handleCron() {
+        console.debug('Called every 60 seconds ', new Date());
+        const gt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes());
+        const lt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes() + 1);
+        const find: Record<string, any> = {
+            schedule: {
+                '$gte': (gt),
+                '$lte': (lt),
+            },
+        };
+
+        console.log({find, lt, gt});
+        const tasks: TaskScheduleDocument[] = await this.taskScheduleService.findAll<TaskScheduleDocument>(find);
+
+
+        for (const v of tasks) {
+            const applications = JSON.parse(v.task);
+            if (Array.isArray(applications)) {
+                for (const app of applications) {
+                    console.log({app});
+                    const id: string = app['app_id'];
+                    console.log({id});
+                    const appl: ApplicationDocument = await this.applicationService.findOne({application_id: id});
+                    if (appl) {
+
+                        delete app.app_name;
+                        const config = {
+                            // method: 'post',
+                            // url: 'https://onesignal.com/api/v1/notifications',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Basic ${appl.basic_auth_key}`
+                            },
+                            // data: JSON.stringify(app),
+                            // data: app,
+                        };
+                        console.log({config});
+
+                        const req = this.httpService.post("https://onesignal.com/api/v1/notifications", JSON.stringify(app), config,);
+                        console.log("response ----");
+                        // const data = await res.toPromise();
+
+                        // req.pipe(
+                        //     catchError((error: AxiosError) => {
+                        //         console.log(error.response.data);
+                        //         throw 'An error happened!';
+                        //     }),
+                        // );
+                        const res = await req.toPromise();
+
+
+                        console.log(res);
+                        console.log(res.data);
+                        console.log(res.headers);
+                    }
+
+                    // res.pipe(map(response => console.log(response.data),),
+                    // );
+
+                }
+            }
+
+            await this.taskScheduleService.deleteOne({_id: v._id});
+
+        }
+
+        return tasks;
+    }
 
 }
