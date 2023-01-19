@@ -1,0 +1,14 @@
+{
+  "list": "Task Schedule list succeed",
+  "get": "Task Schedule get succeed",
+  "create": "Task Schedule creation succeed",
+  "update": "Task Schedule update succeed",
+  "active": "Task Schedule active succeed",
+  "inactive": "Task Schedule inactive succeed",
+  "delete": "Task Schedule delete succeed",
+  "error": {
+    "notFound": "Task Schedule not found",
+    "active": "Task Schedule active status invalid",
+    "exist": "Task Schedule already exist"
+  }
+}

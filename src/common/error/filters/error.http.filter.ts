@@ -132,13 +132,15 @@ export class ErrorHttpFilter implements ExceptionFilter {
             statusHttp,
             resResponse
         });
+
+        console.log({date: Date()});
         responseExpress
-            .setHeader('x-custom-lang', reqCustomLang)
-            .setHeader('x-timestamp', __timestamp)
-            .setHeader('x-timezone', __timezone)
-            .setHeader('x-request-id', __requestId)
-            .setHeader('x-version', __version)
-            .setHeader('x-repo-version', __repoVersion)
+            .setHeader('x-custom-lang', reqCustomLang ?? "")
+            .setHeader('x-timestamp', __timestamp ?? '')
+            .setHeader('x-timezone', __timezone ?? "")
+            .setHeader('x-request-id', __requestId ?? "")
+            .setHeader('x-version', __version ?? "")
+            .setHeader('x-repo-version', __repoVersion ?? "")
             .status(statusHttp || 400)
             .json(resResponse || {});
 

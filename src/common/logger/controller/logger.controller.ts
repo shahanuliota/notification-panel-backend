@@ -29,8 +29,6 @@ export class LoggerController {
     @Response('logger.get')
     @Get('/files')
     fileName() {
-
-
         const getAllFiles = (dirPath, arrayOfFiles) => {
             const files = readdirSync(dirPath);
 

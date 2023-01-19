@@ -37,7 +37,7 @@ export class UserAgentMiddleware implements NestMiddleware {
                 req.headers['user-agent']
             );
 
-            console.log({userAgentParser});
+            // console.log({userAgentParser});
             if (
                 !os.some((val) =>
                     val.match(new RegExp(userAgentParser.os.name))
@@ -49,9 +49,9 @@ export class UserAgentMiddleware implements NestMiddleware {
                     message: 'middleware.error.userAgentOsInvalid',
                 });
             }
-            console.log({browser});
-            console.log({userAgentParser: userAgentParser.browser.name});
-            console.log({rex: new RegExp(userAgentParser.browser.name)});
+            // console.log({browser});
+            // console.log({userAgentParser: userAgentParser.browser.name});
+            // console.log({rex: new RegExp(userAgentParser.browser.name)});
 
             if (
                 !browser.some((val) =>

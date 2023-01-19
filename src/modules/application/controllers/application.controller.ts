@@ -21,6 +21,9 @@ import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 import {AuthApiService} from "../../../common/auth/services/auth.api.service";
 import {IAuthApiRequestHashedData} from "../../../common/auth/auth.interface";
 import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
+import {TaskScheduleDto} from "../dtos/task.schedule.dto";
+import {ScheduleService} from "../services/schedule.service";
+import {TaskScheduleDocument} from "../schemas/task_schedule.schema";
 
 @Controller({
     version: '1',
@@ -31,6 +34,7 @@ export class ApplicationController {
     constructor(private readonly paginationService: PaginationService,
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
+                private readonly taskScheduleService: ScheduleService
     ) {
     }
 
@@ -185,7 +189,7 @@ export class ApplicationController {
         return await this.applicationService.update(app._id, dto);
     }
 
-    @Response('application.update')
+
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)
     @AuthAdminJwtGuard(
@@ -196,6 +200,30 @@ export class ApplicationController {
     async removeGroup(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
 
         return await this.applicationService.removeGroup(app._id, dto);
+    }
+
+    @Response('schedule.create',)
+    // @ApplicationGetGuard()
+    // @RequestParamGuard(TaskScheduleDto)
+    @UserProfileGuard()
+    @AuthAdminJwtGuard()
+    @Post('/schedule')
+    async scheduleNotification(@Body() dto: TaskScheduleDto, @GetUser() user: IUserDocument) {
+        return this.taskScheduleService.create(dto, 'application_schedule', user);
+    }
+
+    @ResponsePaging('schedule.list',)
+    @UserProfileGuard()
+    @AuthAdminJwtGuard()
+    @Get('/schedule/list')
+    async getScheduledList(@GetUser() user: IUserDocument) {
+        const find: Record<string, any> = {
+            owner: user._id,
+        };
+        const tasks: TaskScheduleDocument[] = await this.taskScheduleService.findAll<TaskScheduleDocument>(find);
+        return {
+            data: tasks
+        };
     }
 
 
