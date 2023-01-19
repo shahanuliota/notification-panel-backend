@@ -11,6 +11,7 @@ import {GroupModule} from "../../modules/group/group.module";
 import {AppGroutController} from "../../modules/group/controllers/group.controller";
 import {ApplicationModule} from "../../modules/application/application.module";
 import {ApplicationController} from "../../modules/application/controllers/application.controller";
+import {ScheduleModule} from "@nestjs/schedule";
 
 @Module({
     controllers: [
@@ -23,7 +24,8 @@ import {ApplicationController} from "../../modules/application/controllers/appli
     ],
     providers: [],
     exports: [],
-    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule, ApplicationModule],
+    imports: [UserModule, AuthModule, RoleModule, PermissionModule, GroupModule, ApplicationModule, ScheduleModule.forRoot()
+    ],
 })
 export class RoutesAdminModule {
 }

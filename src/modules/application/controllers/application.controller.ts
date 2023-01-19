@@ -21,6 +21,7 @@ import {ApplicationUpdateDto} from "../dtos/update.application.dto";
 import {AuthApiService} from "../../../common/auth/services/auth.api.service";
 import {IAuthApiRequestHashedData} from "../../../common/auth/auth.interface";
 import {AuthApiDocument} from "../../../common/auth/schemas/auth.api.schema";
+import {TaskScheduleDto} from "../dtos/task.schedule.dto";
 
 @Controller({
     version: '1',
@@ -185,7 +186,7 @@ export class ApplicationController {
         return await this.applicationService.update(app._id, dto);
     }
 
-    @Response('application.update')
+
     @ApplicationGetGuard()
     @RequestParamGuard(ApplicationRequestDto)
     @AuthAdminJwtGuard(
@@ -196,6 +197,15 @@ export class ApplicationController {
     async removeGroup(@GetApplication() app: IApplicationDocument, @Body() dto: ApplicationUpdateDto): Promise<IResponse> {
 
         return await this.applicationService.removeGroup(app._id, dto);
+    }
+
+    // @Response('application.update')
+    // @ApplicationGetGuard()
+    // @RequestParamGuard(TaskScheduleDto)
+    @AuthAdminJwtGuard()
+    @Post('/schedule')
+    async scheduleNotification(@Body() dto: TaskScheduleDto) {
+        return {...dto};
     }
 
 
