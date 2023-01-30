@@ -255,9 +255,8 @@ export class ApplicationController {
 
 
     @Cron(CronExpression.EVERY_MINUTE)
-    // @Get('/schedule/test')
     async handleCron() {
-        console.debug('Called every 60 seconds ', new Date());
+        console.log({date: new Date()});
         const gt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes());
         const lt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes() + 1);
         const find: Record<string, any> = {
@@ -267,12 +266,13 @@ export class ApplicationController {
             },
         };
 
-        console.log({find, lt, gt});
+
         const tasks: TaskScheduleDocument[] = await this.taskScheduleService.findAll<TaskScheduleDocument>(find);
 
 
         for (const v of tasks) {
             const applications = JSON.parse(v.task);
+            console.log({applications});
             if (Array.isArray(applications)) {
                 for (const app of applications) {
                     console.log({app});
@@ -283,42 +283,32 @@ export class ApplicationController {
 
                         delete app.app_name;
                         const config = {
-                            // method: 'post',
-                            // url: 'https://onesignal.com/api/v1/notifications',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Basic ${appl.basic_auth_key}`
                             },
-                            // data: JSON.stringify(app),
-                            // data: app,
                         };
                         console.log({config});
+                        try {
+                            const req = this.httpService.post("https://onesignal.com/api/v1/notifications", JSON.stringify(app), config,);
+                            const res = await req.toPromise();
+                            console.log(res);
+                            console.log(res.data);
+                            console.log(res.headers);
+                            console.log({v});
+                            await this.taskScheduleService.deleteOne({_id: v._id});
 
-                        const req = this.httpService.post("https://onesignal.com/api/v1/notifications", JSON.stringify(app), config,);
-                        console.log("response ----");
-                        // const data = await res.toPromise();
+                        } catch (e) {
+                            console.log({error: 'error occurred'});
+                            console.log({e});
+                            
+                        }
 
-                        // req.pipe(
-                        //     catchError((error: AxiosError) => {
-                        //         console.log(error.response.data);
-                        //         throw 'An error happened!';
-                        //     }),
-                        // );
-                        const res = await req.toPromise();
-
-
-                        console.log(res);
-                        console.log(res.data);
-                        console.log(res.headers);
                     }
 
-                    // res.pipe(map(response => console.log(response.data),),
-                    // );
 
                 }
             }
-
-            await this.taskScheduleService.deleteOne({_id: v._id});
 
         }
 
