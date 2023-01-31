@@ -79,6 +79,7 @@ describe('E2E User', () => {
             role: `${role._id}`,
 
             userAuthKey: faker.random.word(),
+            apiToken: "NON",
         });
 
         const userPopulate = await userService.findOneById<IUserDocument>(

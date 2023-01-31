@@ -85,6 +85,7 @@ describe('E2E User Admin', () => {
             mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
             userAuthKey: "NON",
+            apiToken: "None",
         };
 
         const passwordHash = await authService.createPassword(
@@ -101,6 +102,7 @@ describe('E2E User Admin', () => {
             mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
             userAuthKey: faker.random.word(),
+            apiToken: "NON",
         });
 
         const user = await userService.findOne<IUserDocument>(

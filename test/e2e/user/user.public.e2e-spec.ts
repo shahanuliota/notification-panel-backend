@@ -55,6 +55,7 @@ describe('E2E User Public', () => {
             email: faker.internet.email(),
             mobileNumber: faker.phone.number('01812#########'),
             userAuthKey: faker.random.word(),
+            apiToken: "NON",
 
         };
 

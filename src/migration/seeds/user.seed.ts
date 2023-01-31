@@ -49,6 +49,7 @@ export class UserSeed {
                 role: superadminRole._id,
                 salt: password.salt,
                 userAuthKey: "NON",
+                apiToken: "Non",
             });
 
             await this.userService.create({
@@ -61,6 +62,8 @@ export class UserSeed {
                 role: adminRole._id,
                 salt: password.salt,
                 userAuthKey: "NON",
+
+                apiToken: "Non",
             });
 
             await this.userService.create({
@@ -73,6 +76,8 @@ export class UserSeed {
                 role: userRole._id,
                 salt: password.salt,
                 userAuthKey: "NON",
+
+                apiToken: "Non",
             });
         } catch (err: any) {
             throw new Error(err.message);

@@ -42,4 +42,6 @@ export class UserCreateDto {
 
     @IsNotEmpty()
     readonly userAuthKey: string;
+    @IsNotEmpty()
+    readonly apiToken: string;
 }

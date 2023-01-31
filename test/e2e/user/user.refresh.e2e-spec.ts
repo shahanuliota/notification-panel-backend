@@ -85,6 +85,7 @@ describe('E2E User Refresh', () => {
             mobileNumber: faker.phone.number('01812#########'),
             role: `${role._id}`,
             userAuthKey: faker.random.word(),
+            apiToken: 'NaN',
         });
 
         const userPopulate = await userService.findOneById<IUserDocument>(

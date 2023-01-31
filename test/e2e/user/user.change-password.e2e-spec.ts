@@ -1,25 +1,25 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import {HttpStatus, INestApplication} from '@nestjs/common';
+import {Test} from '@nestjs/testing';
 import request from 'supertest';
-import { faker } from '@faker-js/faker';
-import { connection, Types } from 'mongoose';
-import { RouterModule } from '@nestjs/core';
-import { useContainer } from 'class-validator';
-import { UserService } from 'src/modules/user/services/user.service';
-import { AuthService } from 'src/common/auth/services/auth.service';
-import { AuthApiService } from 'src/common/auth/services/auth.api.service';
-import { RoleService } from 'src/modules/role/services/role.service';
-import { HelperDateService } from 'src/common/helper/services/helper.date.service';
-import { UserDocument } from 'src/modules/user/schemas/user.schema';
-import { CommonModule } from 'src/common/common.module';
-import { RoutesModule } from 'src/router/routes/routes.module';
-import { RoleDocument } from 'src/modules/role/schemas/role.schema';
-import { IUserDocument } from 'src/modules/user/user.interface';
-import { plainToInstance } from 'class-transformer';
-import { UserPayloadSerialization } from 'src/modules/user/serializations/user.payload.serialization';
-import { E2E_USER_CHANGE_PASSWORD_URL } from './user.constant';
-import { ENUM_REQUEST_STATUS_CODE_ERROR } from 'src/common/request/constants/request.status-code.constant';
-import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/constants/user.status-code.constant';
+import {faker} from '@faker-js/faker';
+import {connection, Types} from 'mongoose';
+import {RouterModule} from '@nestjs/core';
+import {useContainer} from 'class-validator';
+import {UserService} from 'src/modules/user/services/user.service';
+import {AuthService} from 'src/common/auth/services/auth.service';
+import {AuthApiService} from 'src/common/auth/services/auth.api.service';
+import {RoleService} from 'src/modules/role/services/role.service';
+import {HelperDateService} from 'src/common/helper/services/helper.date.service';
+import {UserDocument} from 'src/modules/user/schemas/user.schema';
+import {CommonModule} from 'src/common/common.module';
+import {RoutesModule} from 'src/router/routes/routes.module';
+import {RoleDocument} from 'src/modules/role/schemas/role.schema';
+import {IUserDocument} from 'src/modules/user/user.interface';
+import {plainToInstance} from 'class-transformer';
+import {UserPayloadSerialization} from 'src/modules/user/serializations/user.payload.serialization';
+import {E2E_USER_CHANGE_PASSWORD_URL} from './user.constant';
+import {ENUM_REQUEST_STATUS_CODE_ERROR} from 'src/common/request/constants/request.status-code.constant';
+import {ENUM_USER_STATUS_CODE_ERROR} from 'src/modules/user/constants/user.status-code.constant';
 
 describe('E2E User Change Password', () => {
     let app: INestApplication;
@@ -56,7 +56,7 @@ describe('E2E User Change Password', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
         userService = app.get(UserService);
         authService = app.get(AuthService);
         authApiService = app.get(AuthApiService);
@@ -79,6 +79,7 @@ describe('E2E User Change Password', () => {
             mobileNumber: faker.phone.number('62812#########'),
             role: `${role._id}`,
             userAuthKey: faker.random.word(),
+            apiToken: "NON",
         });
 
         const userPopulate = await userService.findOneById<IUserDocument>(
