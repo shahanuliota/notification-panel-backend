@@ -2,12 +2,13 @@ import {DatabaseEntity} from "../../../common/database/decorators/database.decor
 import {Model} from "mongoose";
 import {TaskScheduleDocument, TaskScheduleEntity} from "../schemas/task_schedule.schema";
 import {MongoError} from "mongodb";
-import {ConflictException} from "@nestjs/common";
+import {ConflictException, Injectable} from "@nestjs/common";
 import {ENUM_APPLICATION_STATUS_CODE_ERROR} from "../constant/application.status-code.enum";
 import {TaskScheduleDto} from "../dtos/task.schedule.dto";
 import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
 import {IUserDocument} from "../../user/user.interface";
 
+@Injectable()
 export class ScheduleService {
     constructor(
         @DatabaseEntity(TaskScheduleEntity.name)

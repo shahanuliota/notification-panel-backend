@@ -13,6 +13,7 @@ import {ApplicationModule} from "../../modules/application/application.module";
 import {ApplicationController} from "../../modules/application/controllers/application.controller";
 import {ScheduleModule} from "@nestjs/schedule";
 import {HttpModule} from "@nestjs/axios";
+import {LiveMatchEventController} from "../../modules/application/controllers/live.match.event.controller";
 
 @Module({
     controllers: [
@@ -21,7 +22,8 @@ import {HttpModule} from "@nestjs/axios";
         RoleAdminController,
         PermissionAdminController,
         AppGroutController,
-        ApplicationController
+        ApplicationController,
+        LiveMatchEventController,
     ],
     providers: [],
     exports: [],
