@@ -1,11 +1,11 @@
-import {DynamicModule, Module} from '@nestjs/common';
-import {RouterModule as NestJsRouterModule} from '@nestjs/core';
-import {RoutesAdminModule} from './routes/routes.admin.module';
-import {RoutesCallbackModule} from './routes/routes.callback.module';
-import {RoutesEnumModule} from './routes/routes.enum.module';
-import {RoutesModule} from './routes/routes.module';
-import {RoutesPublicModule} from './routes/routes.public.module';
-import {RoutesTestModule} from './routes/routes.test.module';
+import { DynamicModule, Module } from '@nestjs/common';
+import { RouterModule as NestJsRouterModule } from '@nestjs/core';
+import { RoutesAdminModule } from './routes/routes.admin.module';
+import { RoutesCallbackModule } from './routes/routes.callback.module';
+import { RoutesEnumModule } from './routes/routes.enum.module';
+import { RoutesModule } from './routes/routes.module';
+import { RoutesPublicModule } from './routes/routes.public.module';
+import { RoutesTestModule } from './routes/routes.test.module';
 
 @Module({})
 export class RouterModule {

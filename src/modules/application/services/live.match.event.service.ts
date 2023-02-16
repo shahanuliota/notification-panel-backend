@@ -63,4 +63,12 @@ export class LiveMatchEventService {
         return findAll.lean();
     }
 
+    async deleteOne<T>(find: Record<string, any>): Promise<T> {
+        return this.matchEventModel.findOneAndDelete(find).lean();
+    }
+
+    async findOneById<T>(_id: string): Promise<T> {
+        const applications = this.matchEventModel.findById(_id);
+        return applications.lean();
+    }
 }

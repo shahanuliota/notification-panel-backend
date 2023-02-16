@@ -1,27 +1,27 @@
-import {HttpStatus, INestApplication} from '@nestjs/common';
-import {Test} from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import {faker} from '@faker-js/faker';
-import {RouterModule} from '@nestjs/core';
-import {connection} from 'mongoose';
-import {useContainer} from 'class-validator';
-import {E2E_USER_LOGIN_URL} from './user.constant';
-import {ENUM_REQUEST_STATUS_CODE_ERROR} from 'src/common/request/constants/request.status-code.constant';
+import { faker } from '@faker-js/faker';
+import { RouterModule } from '@nestjs/core';
+import { connection } from 'mongoose';
+import { useContainer } from 'class-validator';
+import { E2E_USER_LOGIN_URL } from './user.constant';
+import { ENUM_REQUEST_STATUS_CODE_ERROR } from 'src/common/request/constants/request.status-code.constant';
 import {
     ENUM_USER_STATUS_CODE_ERROR,
     ENUM_USER_STATUS_CODE_SUCCESS,
 } from 'src/modules/user/constants/user.status-code.constant';
-import {ENUM_ROLE_STATUS_CODE_ERROR} from 'src/modules/role/constants/role.status-code.constant';
-import {CommonModule} from 'src/common/common.module';
-import {RoutesModule} from 'src/router/routes/routes.module';
-import {UserDocument} from 'src/modules/user/schemas/user.schema';
-import {UserService} from 'src/modules/user/services/user.service';
-import {AuthService} from 'src/common/auth/services/auth.service';
-import {RoleService} from 'src/modules/role/services/role.service';
-import {HelperDateService} from 'src/common/helper/services/helper.date.service';
-import {AuthApiService} from 'src/common/auth/services/auth.api.service';
-import {RoleDocument} from 'src/modules/role/schemas/role.schema';
-import {ENUM_AUTH_ACCESS_FOR_DEFAULT} from 'src/common/auth/constants/auth.enum.constant';
+import { ENUM_ROLE_STATUS_CODE_ERROR } from 'src/modules/role/constants/role.status-code.constant';
+import { CommonModule } from 'src/common/common.module';
+import { RoutesModule } from 'src/router/routes/routes.module';
+import { UserDocument } from 'src/modules/user/schemas/user.schema';
+import { UserService } from 'src/modules/user/services/user.service';
+import { AuthService } from 'src/common/auth/services/auth.service';
+import { RoleService } from 'src/modules/role/services/role.service';
+import { HelperDateService } from 'src/common/helper/services/helper.date.service';
+import { AuthApiService } from 'src/common/auth/services/auth.api.service';
+import { RoleDocument } from 'src/modules/role/schemas/role.schema';
+import { ENUM_AUTH_ACCESS_FOR_DEFAULT } from 'src/common/auth/constants/auth.enum.constant';
 
 describe('E2E User Login', () => {
     let app: INestApplication;
@@ -33,7 +33,7 @@ describe('E2E User Login', () => {
 
     const password = `@!${faker.name.firstName().toLowerCase()}${faker.name
         .firstName()
-        .toUpperCase()}${faker.datatype.number({min: 1, max: 99})}`;
+        .toUpperCase()}${faker.datatype.number({ min: 1, max: 99 })}`;
 
     const apiKey = 'qwertyuiop12345zxcvbnmkjh';
     let xApiKey: string;
@@ -60,7 +60,7 @@ describe('E2E User Login', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
+        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
         userService = app.get(UserService);
         authService = app.get(AuthService);
         roleService = app.get(RoleService);
@@ -90,7 +90,7 @@ describe('E2E User Login', () => {
             mobileNumber: faker.phone.number('62812#########'),
             role: `${role._id}`,
             userAuthKey: faker.random.word(),
-            apiToken: "NON",
+            apiToken: 'NON',
         });
 
         timestamp = helperDateService.timestamp();
@@ -265,7 +265,7 @@ describe('E2E User Login', () => {
     afterAll(async () => {
         try {
             await userService.deleteOneById(user._id);
-            await roleService.deleteOne({name: roleName});
+            await roleService.deleteOne({ name: roleName });
         } catch (e) {
             console.error(e);
         }

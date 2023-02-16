@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post} from "@nestjs/common";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
@@ -11,6 +11,11 @@ import {Response, ResponsePaging} from "../../../common/response/decorators/resp
 import {AuthAdminJwtGuard} from "../../../common/auth/decorators/auth.jwt.decorator";
 import {MatchEventDocument} from "../schemas/match.event.schema";
 import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
+import {OnlyIDParamDTO} from "../dtos/only.id.params.dto";
+import {ENUM_AUTH_PERMISSIONS} from "../../../common/auth/constants/auth.enum.permission.constant";
+import {LiveMatchGetGuard} from "../decorators/live-match.decorator";
+import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
+import {GetLiveMatch} from "../decorators/live-match.get.decorator";
 
 @Controller({
     version: '1',
@@ -33,9 +38,7 @@ export class LiveMatchEventController {
         'add'
     )
     saveMatch(@Body() dto: LiveMatchEventCreateDto, @GetUser() user: IUserDocument) {
-
         return this.liveMatchEventService.create(dto, dto.name, user);
-
     }
 
     @ResponsePaging('schedule.list')
@@ -45,5 +48,14 @@ export class LiveMatchEventController {
     async getSavedLiveMach() {
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>({});
         return {data: list};
+    }
+
+    @Response('application.get',)
+    @LiveMatchGetGuard()
+    @RequestParamGuard(OnlyIDParamDTO)
+    @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
+    @Delete('delete/:id')
+    async deleteMatch(@GetLiveMatch() match: MatchEventDocument) {
+        return await this.liveMatchEventService.deleteOne({_id: match._id});
     }
 }

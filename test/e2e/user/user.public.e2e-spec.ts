@@ -1,18 +1,18 @@
-import {HttpStatus, INestApplication} from '@nestjs/common';
-import {Test} from '@nestjs/testing';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 import request from 'supertest';
-import {faker} from '@faker-js/faker';
-import {RouterModule} from '@nestjs/core';
-import {connection} from 'mongoose';
-import {useContainer} from 'class-validator';
-import {UserService} from 'src/modules/user/services/user.service';
-import {HelperDateService} from 'src/common/helper/services/helper.date.service';
-import {AuthApiService} from 'src/common/auth/services/auth.api.service';
-import {CommonModule} from 'src/common/common.module';
-import {RoutesPublicModule} from 'src/router/routes/routes.public.module';
-import {E2E_USER_PUBLIC_SIGN_UP_URL} from './user.constant';
-import {ENUM_REQUEST_STATUS_CODE_ERROR} from 'src/common/request/constants/request.status-code.constant';
-import {ENUM_USER_STATUS_CODE_ERROR} from 'src/modules/user/constants/user.status-code.constant';
+import { faker } from '@faker-js/faker';
+import { RouterModule } from '@nestjs/core';
+import { connection } from 'mongoose';
+import { useContainer } from 'class-validator';
+import { UserService } from 'src/modules/user/services/user.service';
+import { HelperDateService } from 'src/common/helper/services/helper.date.service';
+import { AuthApiService } from 'src/common/auth/services/auth.api.service';
+import { CommonModule } from 'src/common/common.module';
+import { RoutesPublicModule } from 'src/router/routes/routes.public.module';
+import { E2E_USER_PUBLIC_SIGN_UP_URL } from './user.constant';
+import { ENUM_REQUEST_STATUS_CODE_ERROR } from 'src/common/request/constants/request.status-code.constant';
+import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/constants/user.status-code.constant';
 
 describe('E2E User Public', () => {
     let app: INestApplication;
@@ -43,7 +43,7 @@ describe('E2E User Public', () => {
         }).compile();
 
         app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), {fallbackOnErrors: true});
+        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
         userService = app.get(UserService);
         helperDateService = app.get(HelperDateService);
         authApiService = app.get(AuthApiService);
@@ -55,8 +55,7 @@ describe('E2E User Public', () => {
             email: faker.internet.email(),
             mobileNumber: faker.phone.number('01812#########'),
             userAuthKey: faker.random.word(),
-            apiToken: "NON",
-
+            apiToken: 'NON',
         };
 
         timestamp = helperDateService.timestamp();
