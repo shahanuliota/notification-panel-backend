@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Post, Put} from "@nestjs/common";
 import {GetUser} from "../../user/decorators/user.decorator";
 import {IUserDocument} from "../../user/user.interface";
 import {UserProfileGuard} from "../../user/decorators/user.public.decorator";
@@ -16,6 +16,7 @@ import {ENUM_AUTH_PERMISSIONS} from "../../../common/auth/constants/auth.enum.pe
 import {LiveMatchGetGuard} from "../decorators/live-match.decorator";
 import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
 import {GetLiveMatch} from "../decorators/live-match.get.decorator";
+import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
 
 @Controller({
     version: '1',
@@ -58,4 +59,18 @@ export class LiveMatchEventController {
     async deleteMatch(@GetLiveMatch() match: MatchEventDocument) {
         return await this.liveMatchEventService.deleteOne({_id: match._id});
     }
+
+    @Response('application.update')
+    @LiveMatchGetGuard()
+    @RequestParamGuard(OnlyIDParamDTO)
+    @AuthAdminJwtGuard(
+        ENUM_AUTH_PERMISSIONS.APPLICATION_READ,
+        ENUM_AUTH_PERMISSIONS.APPLICATION_UPDATE
+    )
+    @Put('update/:id')
+    async updateLiveMatch(@GetLiveMatch() match: MatchEventDocument, @Body() dto: LiveMatchUpdateDto) {
+        return await this.liveMatchEventService.update(match._id, dto);
+    }
+
+
 }

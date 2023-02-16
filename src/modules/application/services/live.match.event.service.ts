@@ -7,6 +7,8 @@ import {MongoError} from "mongodb";
 import {ENUM_APPLICATION_STATUS_CODE_ERROR} from "../constant/application.status-code.enum";
 import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
 import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
+import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
+import {IApplicationDocument} from "../application.interface";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -70,5 +72,26 @@ export class LiveMatchEventService {
     async findOneById<T>(_id: string): Promise<T> {
         const applications = this.matchEventModel.findById(_id);
         return applications.lean();
+    }
+
+    async update(
+        _id: string,
+        {applications, events}: LiveMatchUpdateDto
+    ) {
+        const update = {
+            events,
+            applications: [...applications.map((e) => new Types.ObjectId(e))]
+        };
+
+        // update = {
+        //     $addToSet: {
+        //         events: {$each: [...events]},
+        //         applications: {$each: applications.map((e) => new Types.ObjectId(e)),}
+        //     },
+        // };
+
+
+        await this.matchEventModel.findByIdAndUpdate<IApplicationDocument>({_id}, update);
+        return this.findOneById<IApplicationDocument>(_id);
     }
 }
