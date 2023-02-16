@@ -49,6 +49,15 @@ export class MatchEventEntity {
         required: true,
     })
     teamA: string;
+    @Prop({
+        required: true,
+    })
+    @Prop({
+        required: false,
+        type: Date
+
+    })
+    schedule?: Date;
 
     @Prop({
         required: true,

@@ -21,6 +21,11 @@ export class LiveMatchEventService {
 
     async create(dto: LiveMatchEventCreateDto, name: string, user: IUserDocument): Promise<MatchEventDocument> {
         try {
+            const date = new Date(dto.startTime * 1000);
+            /// compare date
+//            date.setMinutes(date.getMinutes() - 3);
+
+
             const create: MatchEventDocument = new this.matchEventModel<MatchEventEntity>({
                 name: name,
                 matchId: dto.matchId,
@@ -30,6 +35,8 @@ export class LiveMatchEventService {
                 teamA: dto.teamA,
                 teamB: dto.teamB,
                 startTime: dto.startTime,
+                schedule: date,
+
             });
 
             await create.save();
@@ -99,5 +106,12 @@ export class LiveMatchEventService {
 
         await this.matchEventModel.findByIdAndUpdate<IApplicationDocument>({_id}, update);
         return this.findOneById<IApplicationDocument>(_id);
+    }
+
+
+    async handleCornEvents() {
+
+
+        return;
     }
 }
