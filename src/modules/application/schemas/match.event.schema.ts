@@ -1,6 +1,7 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {Document, Types} from 'mongoose';
 import {UserEntity} from "../../user/schemas/user.schema";
+import {ApplicationEntity} from "./application.schema";
 
 @Schema({timestamps: true, versionKey: false})
 export class MatchEventEntity {
@@ -14,9 +15,22 @@ export class MatchEventEntity {
 
     @Prop({
         required: true,
+        unique: true,
 
     })
-    task: string;
+    matchId: string;
+    @Prop({
+        required: true,
+    })
+    events: string[];
+
+    @Prop({
+        required: false,
+        type: Array,
+        ref: ApplicationEntity.name,
+        default: []
+    })
+    applications: Types.ObjectId[];
 
 
     @Prop({
@@ -25,6 +39,21 @@ export class MatchEventEntity {
         ref: UserEntity.name,
     })
     owner: Types.ObjectId;
+
+    @Prop({
+        required: true,
+    })
+    startTime: number;
+
+    @Prop({
+        required: true,
+    })
+    teamA: string;
+
+    @Prop({
+        required: true,
+    })
+    teamB: string;
 }
 
 export const MatchEventDatabaseName = 'live_match_event';

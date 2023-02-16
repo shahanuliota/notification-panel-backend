@@ -1,11 +1,12 @@
 import {ConflictException, Injectable} from "@nestjs/common";
 import {DatabaseEntity} from "../../../common/database/decorators/database.decorator";
-import {Model} from "mongoose";
+import {Model, Types} from "mongoose";
 import {MatchEventDocument, MatchEventEntity} from "../schemas/match.event.schema";
-import {TaskScheduleDto} from "../dtos/task.schedule.dto";
 import {IUserDocument} from "../../user/user.interface";
 import {MongoError} from "mongodb";
 import {ENUM_APPLICATION_STATUS_CODE_ERROR} from "../constant/application.status-code.enum";
+import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
+import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -15,13 +16,17 @@ export class LiveMatchEventService {
     ) {
     }
 
-    async create(dto: TaskScheduleDto, name: string, user: IUserDocument): Promise<MatchEventDocument> {
+    async create(dto: LiveMatchEventCreateDto, name: string, user: IUserDocument): Promise<MatchEventDocument> {
         try {
-            const create: MatchEventDocument = new this.matchEventModel({
+            const create: MatchEventDocument = new this.matchEventModel<MatchEventEntity>({
                 name: name,
-                task: dto.applications,
-
+                matchId: dto.matchId,
+                events: dto.events,
+                applications: dto.applications.map((e) => new Types.ObjectId(e)),
                 owner: user._id,
+                teamA: dto.teamA,
+                teamB: dto.teamB,
+                startTime: dto.startTime,
             });
 
             await create.save();
@@ -37,6 +42,25 @@ export class LiveMatchEventService {
             }
             throw error;
         }
+    }
+
+    async findAll<T>(
+        find?: Record<string, any>,
+        options?: IDatabaseFindAllOptions
+    ): Promise<T[]> {
+        const findAll = this.matchEventModel.find(find);
+        if (
+            options &&
+            options.limit !== undefined &&
+            options.skip !== undefined
+        ) {
+            findAll.limit(options.limit).skip(options.skip);
+        }
+
+        if (options && options.sort) {
+            findAll.sort(options.sort);
+        }
+        return findAll.lean();
     }
 
 }
