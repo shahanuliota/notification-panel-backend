@@ -171,6 +171,8 @@ export class UserAdminController {
                 passwordExpired: password.passwordExpired,
                 salt: password.salt,
                 userAuthKey: body.userAuthKey,
+                apiToken: body.apiToken,
+
             });
 
             return {

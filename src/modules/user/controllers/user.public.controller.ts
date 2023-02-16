@@ -87,6 +87,7 @@ export class UserPublicController {
                 passwordExpired: password.passwordExpired,
                 salt: password.salt,
                 userAuthKey: body.userAuthKey,
+                apiToken: body.apiToken,
             });
 
             const user: IUserDocument =

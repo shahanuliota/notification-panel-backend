@@ -125,6 +125,8 @@ export class UserService {
                      mobileNumber,
                      role,
                      userAuthKey,
+                     apiToken,
+
                  }: IUserCreate): Promise<UserDocument> {
         const user: UserEntity = {
             firstName,
@@ -137,6 +139,7 @@ export class UserService {
             salt,
             userAuthKey,
             passwordExpired,
+            apiToken,
         };
 
         const create: UserDocument = new this.userModel(user);

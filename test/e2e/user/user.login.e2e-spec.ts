@@ -90,6 +90,7 @@ describe('E2E User Login', () => {
             mobileNumber: faker.phone.number('62812#########'),
             role: `${role._id}`,
             userAuthKey: faker.random.word(),
+            apiToken: 'NON',
         });
 
         timestamp = helperDateService.timestamp();

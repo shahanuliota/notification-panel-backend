@@ -6,6 +6,8 @@ import {ApplicationService} from "./services/application.service";
 import {TaskScheduleDatabaseName, TaskScheduleEntity, TaskScheduleSchema} from "./schemas/task_schedule.schema";
 import {ScheduleService} from "./services/schedule.service";
 import {HttpModule} from "@nestjs/axios";
+import {MatchEventDatabaseName, MatchEventEntity, MatchEventSchema} from "./schemas/match.event.schema";
+import {LiveMatchEventService} from "./services/live.match.event.service";
 
 @Module({
     imports: [
@@ -20,15 +22,19 @@ import {HttpModule} from "@nestjs/axios";
                     name: TaskScheduleEntity.name,
                     schema: TaskScheduleSchema,
                     collection: TaskScheduleDatabaseName,
-                },
+                }, {
+                name: MatchEventEntity.name,
+                schema: MatchEventSchema,
+                collection: MatchEventDatabaseName,
+            },
             ],
             DATABASE_CONNECTION_NAME
         ),
         HttpModule,
     ],
 
-    providers: [ApplicationService, ScheduleService],
-    exports: [ApplicationService, ScheduleService],
+    providers: [ApplicationService, ScheduleService, LiveMatchEventService],
+    exports: [ApplicationService, ScheduleService, LiveMatchEventService],
 })
 export class ApplicationModule {
 }

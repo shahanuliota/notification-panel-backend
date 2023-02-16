@@ -1,14 +1,16 @@
-import { Command } from 'nestjs-command';
-import { Injectable } from '@nestjs/common';
-import { AuthApiService } from 'src/common/auth/services/auth.api.service';
-import { AuthApiBulkService } from 'src/common/auth/services/auth.api.bulk.service';
+import {Command} from 'nestjs-command';
+import {Injectable} from '@nestjs/common';
+import {AuthApiService} from 'src/common/auth/services/auth.api.service';
+import {AuthApiBulkService} from 'src/common/auth/services/auth.api.bulk.service';
 
 @Injectable()
 export class AuthApiSeed {
     constructor(
         private readonly authApiService: AuthApiService,
         private readonly authApiBulkService: AuthApiBulkService
-    ) {}
+    ) {
+
+    }
 
     @Command({
         command: 'insert:authapis',

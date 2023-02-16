@@ -64,6 +64,11 @@ export class UserEntity {
         required: true,
     })
     userAuthKey: string;
+    @Prop({
+        required: true,
+        default: '',
+    })
+    apiToken: string;
 
     @Prop({
         required: true,

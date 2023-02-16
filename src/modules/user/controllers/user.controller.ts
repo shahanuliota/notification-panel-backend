@@ -256,6 +256,7 @@ export class UserController {
             };
         }
         const userAuthKey = user.userAuthKey;
+        const apiToken = user.apiToken;
 
         return {
             metadata: {
@@ -267,6 +268,7 @@ export class UserController {
             accessToken,
             refreshToken,
             userAuthKey,
+            apiToken,
         };
     }
 
