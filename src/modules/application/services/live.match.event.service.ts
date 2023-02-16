@@ -9,6 +9,7 @@ import {IDatabaseFindAllOptions} from "../../../common/database/database.interfa
 import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
 import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
 import {IApplicationDocument} from "../application.interface";
+import {ApplicationEntity} from "../schemas/application.schema";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -50,7 +51,12 @@ export class LiveMatchEventService {
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
     ): Promise<T[]> {
-        const findAll = this.matchEventModel.find(find);
+        const findAll = this.matchEventModel.find(find).populate({
+            path: 'applications',
+            model: ApplicationEntity.name,
+            select: ['_id', 'name']
+
+        });
         if (
             options &&
             options.limit !== undefined &&
