@@ -28,7 +28,7 @@ import {TaskScheduleRequestDto} from "../dtos/task.schedule.request.dto";
 import {TaskScheduleGetGuard} from "../decorators/task.schedule.decorator";
 import {GetTaskSchedule} from "../decorators/task-schedule.get.decorator";
 import {HttpService} from "@nestjs/axios";
-import {Cron, CronExpression} from "@nestjs/schedule";
+import {Cron, CronExpression, SchedulerRegistry} from "@nestjs/schedule";
 
 @Controller({
     version: '1',
@@ -40,7 +40,8 @@ export class ApplicationController {
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
                 private readonly taskScheduleService: ScheduleService,
-                private readonly httpService: HttpService
+                private readonly httpService: HttpService,
+                private schedulerRegistry: SchedulerRegistry
     ) {
     }
 
@@ -213,7 +214,13 @@ export class ApplicationController {
     @AuthAdminJwtGuard()
     @Post('/schedule')
     async scheduleNotification(@Body() dto: TaskScheduleDto, @GetUser() user: IUserDocument) {
+        const job = this.schedulerRegistry.getCronJob('notifications');
+        if (job.running !== true) {
+            job.start();
+            console.log('notifications corn job started');
+        }
         return this.taskScheduleService.create(dto, dto.name, user);
+
     }
 
     @ResponsePaging('schedule.list')
@@ -254,7 +261,9 @@ export class ApplicationController {
     }
 
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_MINUTE, {
+        name: "notifications"
+    })
     async handleCron() {
         console.log({date: new Date()});
         const gt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes());
@@ -301,7 +310,7 @@ export class ApplicationController {
                         } catch (e) {
                             console.log({error: 'error occurred'});
                             console.log({e});
-                            
+
                         }
 
                     }
@@ -311,6 +320,17 @@ export class ApplicationController {
             }
 
         }
+
+
+        const count = await this.taskScheduleService.getTotal({});
+        console.log({count});
+
+        if (count === 0) {
+            const job = this.schedulerRegistry.getCronJob('notifications');
+            job.stop();
+            console.log('notifications corn job stopped');
+        }
+
 
         return tasks;
     }

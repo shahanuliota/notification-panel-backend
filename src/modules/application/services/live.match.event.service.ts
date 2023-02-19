@@ -9,12 +9,17 @@ import {IDatabaseFindAllOptions} from "../../../common/database/database.interfa
 import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
 import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
 import {ApplicationEntity} from "../schemas/application.schema";
+import {NotificationOptionEnum} from "../constant/match-event.constant";
+import {HttpService} from "@nestjs/axios";
+import {EventTriggerService} from "./event-trigger.service";
 
 @Injectable()
 export class LiveMatchEventService {
     constructor(
         @DatabaseEntity(MatchEventEntity.name)
-        private readonly matchEventModel: Model<MatchEventDocument>
+        private readonly matchEventModel: Model<MatchEventDocument>,
+        private readonly httpService: HttpService,
+        private readonly triggerEvent: EventTriggerService,
     ) {
     }
 
@@ -106,20 +111,140 @@ export class LiveMatchEventService {
         await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>({_id}, update);
         const match: MatchEventDocument = await this.findOneById<MatchEventDocument>(_id);
         await this.setNextEvents(match);
-        return match;
+        return await this.findOneById<MatchEventDocument>(_id);
     }
 
 
-    async handleCornEvents() {
-        return;
+    async updateScheduleTme(_id: string, time: Date) {
+
+        const update = {
+            schedule: time
+        };
+        await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>({_id}, update);
     }
 
 
     async setNextEvents(match: MatchEventDocument) {
 
-        const events = match.events;
+        const events: string[] = match.events;
+        console.log({events});
 
-        console.log(events);
+        const timestamp = match.startTime;
+        const targetTime = new Date(timestamp * 1000);
+        const now = new Date();
+        const differenceInMs = targetTime.getTime() - now.getTime();
+
+        if (events.includes(NotificationOptionEnum.toss)) {
+
+
+            targetTime.setMinutes(targetTime.getMinutes() - 30);
+            console.log({targetTime});
+            const differenceInMs = targetTime.getTime() - now.getTime();
+
+            if (differenceInMs < 0) {
+                console.log('The target time has already passed.');
+                now.setMinutes(now.getMinutes() + 2);
+                await this.updateScheduleTme(match._id, now);
+
+            } else {
+                console.log(`The target time is ${differenceInMs} milliseconds from now.`);
+                await this.updateScheduleTme(match._id, targetTime);
+            }
+
+
+        } else if (events.includes(NotificationOptionEnum.firstInnings)) {
+            await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
+        } else if (events.includes(NotificationOptionEnum.lastInnings)) {
+
+        }
+
+        return;
+    }
+
+    async triggerEvents(match: MatchEventDocument) {
+        const events: string[] = match.events;
+        const applications: string[] = match.applications.map(e => e.toString());
+        try {
+            const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=4ab982342fa8b9489aec4ab3383b4290`;
+            const req = this.httpService.get(matchUrl);
+            const res = await req.toPromise();
+            console.log({res});
+            const resData = res.data.response;
+
+            ///if match Abandoned, canceled, no result
+            if (resData.status == 4) {
+                return this.deleteOne({_id: match._id});
+            }
+
+
+            if (events.includes(NotificationOptionEnum.toss)) {
+
+                const message = resData.toss.text;
+                if (message) {
+                    await this.triggerEvent.triggerEvents(applications, message, 'Toss');
+                    const filteredArray = events.filter(item => item != NotificationOptionEnum.toss);
+                    return await this.update(match._id, {
+                        events: filteredArray,
+                        applications: applications,
+                    });
+                }
+                /// if no toss then trigger event after 10 minute
+                if (resData.status == 1) {
+                    const targetTime = new Date();
+                    targetTime.setMinutes(targetTime.getMinutes() + 10);
+                    return await this.updateScheduleTme(match._id, targetTime);
+                }
+
+            } else if (events.includes(NotificationOptionEnum.firstInnings)) {
+                if (resData.status == 1) {
+                    const targetTime = new Date();
+                    targetTime.setMinutes(targetTime.getMinutes() + 10);
+                    return await this.updateScheduleTme(match._id, targetTime);
+                }
+                /// if match is live then trigger events
+                if (resData.status == 3) {
+                    const message = resData.title + 'match started';
+                    if (resData.title) {
+                        await this.triggerEvent.triggerEvents(applications, message, 'Match Started');
+                    }
+                }
+                /// remove firstInnings event from list
+                const filteredArray = events.filter(item => item != NotificationOptionEnum.firstInnings);
+                return await this.update(match._id, {
+                    events: filteredArray,
+                    applications: applications,
+                });
+
+                /// after complete first innings
+                if (events.includes(NotificationOptionEnum.lastInnings) && resData.status == 3) {
+                    const targetTime = new Date();
+                    targetTime.setMinutes(targetTime.getMinutes() + 40);
+                    return await this.updateScheduleTme(match._id, targetTime);
+                }
+
+
+            } else if (events.includes(NotificationOptionEnum.lastInnings)) {
+
+                /// if match completed
+                if (resData.status == 2) {
+
+                    const message = resData.status_note;
+                    if (resData.message) {
+                        await this.triggerEvent.triggerEvents(applications, message, 'Match Completed');
+                    }
+                    return this.deleteOne({_id: match._id});
+                } else {
+                    const targetTime = new Date();
+                    targetTime.setMinutes(targetTime.getMinutes() + 40);
+                    return await this.updateScheduleTme(match._id, targetTime);
+                }
+
+            }
+
+        } catch (e) {
+            console.log({error: '[triggerEvents] error occurred'});
+            console.log({e});
+        }
 
 
         return;
