@@ -11,6 +11,7 @@ import {LiveMatchEventService} from "./services/live.match.event.service";
 import {EventTriggerService} from "./services/event-trigger.service";
 import {UserModule} from "../user/user.module";
 import {EventNameDatabaseName, EventNameEntity, EventNameSchema} from "./schemas/event-name.schema";
+import {EventNameService} from "./services/event-name.service";
 
 @Module({
     imports: [
@@ -43,8 +44,8 @@ import {EventNameDatabaseName, EventNameEntity, EventNameSchema} from "./schemas
         UserModule,
     ],
 
-    providers: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService],
-    exports: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService],
+    providers: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService, EventNameService],
+    exports: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService, EventNameService],
 })
 export class ApplicationModule {
 }

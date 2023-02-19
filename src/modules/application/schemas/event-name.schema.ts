@@ -6,7 +6,6 @@ import {UserEntity} from "../../user/schemas/user.schema";
 export class EventNameEntity {
     @Prop({
         required: true,
-        uppercase: true,
         trim: true,
 
     })
