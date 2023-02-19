@@ -1,8 +1,8 @@
 import {createParamDecorator, ExecutionContext} from "@nestjs/common";
-import {TaskScheduleDocument} from "../schemas/task_schedule.schema";
+import {MatchEventDocument} from "../schemas/match.event.schema";
 
 export const GetLiveMatch = createParamDecorator(
-    (data: string, ctx: ExecutionContext): TaskScheduleDocument => {
+    (data: string, ctx: ExecutionContext): MatchEventDocument => {
         const {__liveMatch} = ctx.switchToHttp().getRequest();
         return __liveMatch;
     }
