@@ -17,6 +17,7 @@ import {LiveMatchGetGuard} from "../decorators/live-match.decorator";
 import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
 import {GetLiveMatch} from "../decorators/live-match.get.decorator";
 import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
+import {Cron, CronExpression} from "@nestjs/schedule";
 
 @Controller({
     version: '1',
@@ -28,7 +29,7 @@ export class LiveMatchEventController {
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
                 private readonly liveMatchEventService: LiveMatchEventService,
-                private readonly httpService: HttpService
+                private readonly httpService: HttpService,
     ) {
     }
 
@@ -70,6 +71,27 @@ export class LiveMatchEventController {
     @Put('update/:id')
     async updateLiveMatch(@GetLiveMatch() match: MatchEventDocument, @Body() dto: LiveMatchUpdateDto) {
         return await this.liveMatchEventService.update(match._id, dto);
+    }
+
+    @Cron(CronExpression.EVERY_MINUTE, {
+        name: "match-event"
+    })
+    async matchCornJob() {
+        console.log({matchCornJob: new Date()});
+        const gt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes());
+        const lt = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes() + 1);
+        const find: Record<string, any> = {
+            schedule: {
+                '$gte': (gt),
+                '$lte': (lt),
+            },
+        };
+        const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
+        for (const v of list) {
+            await this.liveMatchEventService.triggerEvents(v);
+        }
+
+        return;
     }
 
 

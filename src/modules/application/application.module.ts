@@ -8,6 +8,8 @@ import {ScheduleService} from "./services/schedule.service";
 import {HttpModule} from "@nestjs/axios";
 import {MatchEventDatabaseName, MatchEventEntity, MatchEventSchema} from "./schemas/match.event.schema";
 import {LiveMatchEventService} from "./services/live.match.event.service";
+import {EventTriggerService} from "./services/event-trigger.service";
+import {UserModule} from "../user/user.module";
 
 @Module({
     imports: [
@@ -31,10 +33,11 @@ import {LiveMatchEventService} from "./services/live.match.event.service";
             DATABASE_CONNECTION_NAME
         ),
         HttpModule,
+        UserModule,
     ],
 
-    providers: [ApplicationService, ScheduleService, LiveMatchEventService],
-    exports: [ApplicationService, ScheduleService, LiveMatchEventService],
+    providers: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService],
+    exports: [ApplicationService, ScheduleService, LiveMatchEventService, EventTriggerService],
 })
 export class ApplicationModule {
 }
