@@ -8,7 +8,6 @@ import {ENUM_APPLICATION_STATUS_CODE_ERROR} from "../constant/application.status
 import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
 import {LiveMatchEventCreateDto} from "../dtos/live_match_event.create.dto";
 import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
-import {IApplicationDocument} from "../application.interface";
 import {ApplicationEntity} from "../schemas/application.schema";
 
 @Injectable()
@@ -104,14 +103,26 @@ export class LiveMatchEventService {
         // };
 
 
-        await this.matchEventModel.findByIdAndUpdate<IApplicationDocument>({_id}, update);
-        return this.findOneById<IApplicationDocument>(_id);
+        await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>({_id}, update);
+        const match: MatchEventDocument = await this.findOneById<MatchEventDocument>(_id);
+        await this.setNextEvents(match);
+        return match;
     }
 
 
     async handleCornEvents() {
+        return;
+    }
+
+
+    async setNextEvents(match: MatchEventDocument) {
+
+        const events = match.events;
+
+        console.log(events);
 
 
         return;
     }
+
 }
