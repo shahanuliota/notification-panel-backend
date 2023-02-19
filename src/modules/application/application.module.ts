@@ -10,6 +10,7 @@ import {MatchEventDatabaseName, MatchEventEntity, MatchEventSchema} from "./sche
 import {LiveMatchEventService} from "./services/live.match.event.service";
 import {EventTriggerService} from "./services/event-trigger.service";
 import {UserModule} from "../user/user.module";
+import {EventNameDatabaseName, EventNameEntity, EventNameSchema} from "./schemas/event-name.schema";
 
 @Module({
     imports: [
@@ -24,11 +25,17 @@ import {UserModule} from "../user/user.module";
                     name: TaskScheduleEntity.name,
                     schema: TaskScheduleSchema,
                     collection: TaskScheduleDatabaseName,
-                }, {
-                name: MatchEventEntity.name,
-                schema: MatchEventSchema,
-                collection: MatchEventDatabaseName,
-            },
+                },
+                {
+                    name: MatchEventEntity.name,
+                    schema: MatchEventSchema,
+                    collection: MatchEventDatabaseName,
+                },
+                {
+                    name: EventNameEntity.name,
+                    schema: EventNameSchema,
+                    collection: EventNameDatabaseName,
+                },
             ],
             DATABASE_CONNECTION_NAME
         ),

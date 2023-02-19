@@ -14,6 +14,7 @@ import {ApplicationController} from "../../modules/application/controllers/appli
 import {ScheduleModule} from "@nestjs/schedule";
 import {HttpModule} from "@nestjs/axios";
 import {LiveMatchEventController} from "../../modules/application/controllers/live.match.event.controller";
+import {EventNameController} from "../../modules/application/controllers/event-name.controller";
 
 @Module({
     controllers: [
@@ -24,6 +25,7 @@ import {LiveMatchEventController} from "../../modules/application/controllers/li
         AppGroutController,
         ApplicationController,
         LiveMatchEventController,
+        EventNameController,
     ],
     providers: [],
     exports: [],
