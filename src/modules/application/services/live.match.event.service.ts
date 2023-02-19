@@ -12,6 +12,7 @@ import {ApplicationEntity} from "../schemas/application.schema";
 import {NotificationOptionEnum} from "../constant/match-event.constant";
 import {HttpService} from "@nestjs/axios";
 import {EventTriggerService} from "./event-trigger.service";
+import {UserService} from "../../user/services/user.service";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -20,6 +21,7 @@ export class LiveMatchEventService {
         private readonly matchEventModel: Model<MatchEventDocument>,
         private readonly httpService: HttpService,
         private readonly triggerEvent: EventTriggerService,
+        private readonly userService: UserService,
     ) {
     }
 
@@ -165,7 +167,8 @@ export class LiveMatchEventService {
         const events: string[] = match.events;
         const applications: string[] = match.applications.map(e => e.toString());
         try {
-            const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=4ab982342fa8b9489aec4ab3383b4290`;
+            const user = await this.userService.findOne<IUserDocument>({email: 'admin@mail.com'});
+            const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
             const req = this.httpService.get(matchUrl);
             const res = await req.toPromise();
             console.log({res});

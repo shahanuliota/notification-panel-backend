@@ -29,7 +29,7 @@ export class LiveMatchEventController {
                 private readonly applicationService: ApplicationService,
                 private readonly authApiService: AuthApiService,
                 private readonly liveMatchEventService: LiveMatchEventService,
-                private readonly httpService: HttpService
+                private readonly httpService: HttpService,
     ) {
     }
 
