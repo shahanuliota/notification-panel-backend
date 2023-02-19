@@ -55,4 +55,13 @@ export class EventNameService {
         }
         return findAll.lean();
     }
+
+    async deleteOne<T>(find: Record<string, any>): Promise<T> {
+        return this.eventNameModel.findOneAndDelete(find).lean();
+    }
+
+    async findOneById<T>(_id: string): Promise<T> {
+        const applications = this.eventNameModel.findById(_id);
+        return applications.lean();
+    }
 }
