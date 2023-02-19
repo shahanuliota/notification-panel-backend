@@ -17,7 +17,7 @@ import {LiveMatchGetGuard} from "../decorators/live-match.decorator";
 import {RequestParamGuard} from "../../../common/request/decorators/request.decorator";
 import {GetLiveMatch} from "../decorators/live-match.get.decorator";
 import {LiveMatchUpdateDto} from "../dtos/live-match.update.dto";
-import {Cron, CronExpression} from "@nestjs/schedule";
+import {Cron, CronExpression, SchedulerRegistry} from "@nestjs/schedule";
 
 @Controller({
     version: '1',
@@ -30,6 +30,7 @@ export class LiveMatchEventController {
                 private readonly authApiService: AuthApiService,
                 private readonly liveMatchEventService: LiveMatchEventService,
                 private readonly httpService: HttpService,
+                private schedulerRegistry: SchedulerRegistry
     ) {
     }
 
@@ -40,6 +41,12 @@ export class LiveMatchEventController {
         'add'
     )
     saveMatch(@Body() dto: LiveMatchEventCreateDto, @GetUser() user: IUserDocument) {
+        const job = this.schedulerRegistry.getCronJob('match-event');
+
+        if (job.running !== true) {
+            job.start();
+            console.log('match-event corn job started');
+        }
         return this.liveMatchEventService.create(dto, dto.name, user);
     }
 
@@ -89,6 +96,12 @@ export class LiveMatchEventController {
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
         for (const v of list) {
             await this.liveMatchEventService.triggerEvents(v);
+        }
+        const remainingList: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>();
+        if (remainingList.length == 0) {
+            const job = this.schedulerRegistry.getCronJob('match-event');
+            job.stop();
+            console.log('match-event corn job stopped');
         }
 
         return;
