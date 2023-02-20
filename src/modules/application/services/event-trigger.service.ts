@@ -12,10 +12,13 @@ export class EventTriggerService {
 
 
     async triggerEvents(applications: string[], message: string, headings: string) {
+        console.log('triggerEvents called ');
+        console.log({applications});
 
         for (const app of applications) {
             const id: string = app;
-            const appl: ApplicationDocument = await this.applicationService.findOne({application_id: id});
+            const appl: ApplicationDocument = await this.applicationService.findOne({_id: id});
+            console.log({appl});
             if (appl) {
                 const config = {
                     headers: {
@@ -27,20 +30,30 @@ export class EventTriggerService {
                 try {
                     const data = {
                         "app_id": appl.application_id,
-                        "included_segments": ["Subscribed Users"],
-                        "data": {"message": message},
-                        "contents": {"en": message},
-                        "headings": {"en": headings},
+                        //  "app_name": appl.name,
+                        "included_segments": [
+                            "Subscribed Users"
+                        ],
+                        "data": {
+                            "foo": "bar"
+                        },
+                        "contents": {
+                            "en": message
+                        },
+                        "headings": {
+                            "en": headings
+                        }
                     };
-                    const req = this.httpService.post("https://onesignal.com/api/v1/notifications", JSON.stringify({data}), config,);
+
+                    const req = this.httpService.post("https://onesignal.com/api/v1/notifications", JSON.stringify(data), config,);
                     const res = await req.toPromise();
-                    console.log(res);
+                    // console.log(res);
                     console.log(res.data);
-                    console.log(res.headers);
+                    //  console.log(res.headers);
 
                 } catch (e) {
                     console.log({error: 'error occurred'});
-                    console.log({e});
+                    console.log(e.response.data);
                 }
             }
 

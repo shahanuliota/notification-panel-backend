@@ -93,7 +93,12 @@ export class LiveMatchEventController {
                 '$lte': (lt),
             },
         };
+        // console.log({find});
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
+
+
+        // console.log({list: "list length"});
+        // console.log(list.length);
         for (const v of list) {
             await this.liveMatchEventService.triggerEvents(v);
         }
@@ -105,6 +110,21 @@ export class LiveMatchEventController {
         }
 
         return;
+    }
+
+
+    @Get('test')
+    async testCornJob() {
+
+        const find = {
+            matchId: 60874
+        };
+        const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
+        for (const v of list) {
+            await this.liveMatchEventService.triggerEvents(v);
+        }
+        return 'ok';
+
     }
 
 
