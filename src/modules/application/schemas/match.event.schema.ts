@@ -2,6 +2,7 @@ import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {Document, Types} from 'mongoose';
 import {UserEntity} from "../../user/schemas/user.schema";
 import {ApplicationEntity} from "./application.schema";
+import {EventNameEntity} from "./event-name.schema";
 
 @Schema({timestamps: true, versionKey: false})
 export class MatchEventEntity {
@@ -20,9 +21,12 @@ export class MatchEventEntity {
     })
     matchId: string;
     @Prop({
-        required: true,
+        required: false,
+        type: Array,
+        ref: EventNameEntity.name,
+        default: []
     })
-    events: string[];
+    events: Types.ObjectId[];
 
     @Prop({
         required: false,

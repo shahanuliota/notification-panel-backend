@@ -13,6 +13,7 @@ import {NotificationOptionEnum} from "../constant/match-event.constant";
 import {HttpService} from "@nestjs/axios";
 import {EventTriggerService} from "./event-trigger.service";
 import {UserService} from "../../user/services/user.service";
+import {EventNameEntity} from "../schemas/event-name.schema";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -35,7 +36,7 @@ export class LiveMatchEventService {
             const create: MatchEventDocument = new this.matchEventModel<MatchEventEntity>({
                 name: name,
                 matchId: dto.matchId,
-                events: dto.events,
+                events: dto.events.map((e) => new Types.ObjectId(e)),
                 applications: dto.applications.map((e) => new Types.ObjectId(e)),
                 owner: user._id,
                 teamA: dto.teamA,
@@ -64,12 +65,20 @@ export class LiveMatchEventService {
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
     ): Promise<T[]> {
-        const findAll = this.matchEventModel.find(find).populate({
-            path: 'applications',
-            model: ApplicationEntity.name,
-            select: ['_id', 'name']
+        const findAll = this.matchEventModel.find(find)
+            .populate({
+                path: 'applications',
+                model: ApplicationEntity.name,
+                select: ['_id', 'name']
 
-        });
+            })
+            .populate({
+                path: 'events',
+                model: EventNameEntity.name,
+                select: ['_id', 'name', 'message']
+
+            })
+        ;
         if (
             options &&
             options.limit !== undefined &&
@@ -89,7 +98,17 @@ export class LiveMatchEventService {
     }
 
     async findOneById<T>(_id: string): Promise<T> {
-        const applications = this.matchEventModel.findById(_id);
+        const applications = this.matchEventModel.findById(_id).populate({
+            path: 'applications',
+            model: ApplicationEntity.name,
+            select: ['_id', 'name']
+
+        }).populate({
+            path: 'events',
+            model: EventNameEntity.name,
+            select: ['_id', 'name', 'message']
+
+        });
         return applications.lean();
     }
 
@@ -98,7 +117,7 @@ export class LiveMatchEventService {
         {applications, events}: LiveMatchUpdateDto
     ) {
         const update = {
-            events,
+            events: [...events.map((e) => new Types.ObjectId(e))],
             applications: [...applications.map((e) => new Types.ObjectId(e))]
         };
 
@@ -128,7 +147,8 @@ export class LiveMatchEventService {
 
     async setNextEvents(match: MatchEventDocument) {
 
-        const events: string[] = match.events;
+        const eData: any[] = match.events;
+        const events: string[] = eData.map<string>(e => e.name.toString());
         console.log({events});
 
         const timestamp = match.startTime;
@@ -164,7 +184,10 @@ export class LiveMatchEventService {
     }
 
     async triggerEvents(match: MatchEventDocument) {
-        const events: string[] = match.events;
+
+        const dat: any[] = match.events;
+        const events: string[] = dat.map<string>(e => e.name.toString());
+
         const applications: string[] = match.applications.map<string>(e => e._id.toString());
         try {
             console.log('triggerEvents called with match id ' + match.matchId);
@@ -180,7 +203,8 @@ export class LiveMatchEventService {
                 return this.deleteOne({_id: match._id});
             }
 
-            /// test purpose
+
+            // test purpose
             // if (true) {
             //     const message = resData.short_title;
             //     await this.triggerEvent.triggerEvents(applications, message, 'Schedule');

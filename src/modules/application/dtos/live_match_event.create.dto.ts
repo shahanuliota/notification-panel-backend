@@ -1,4 +1,4 @@
-import {IsArray, IsIn, IsJSON, IsMongoId, IsNotEmpty, IsNumber, IsString} from "class-validator";
+import {IsArray, IsJSON, IsMongoId, IsNotEmpty, IsNumber, IsString} from "class-validator";
 
 export class LiveMatchEventCreateDto {
     @IsMongoId({each: true})
@@ -13,10 +13,11 @@ export class LiveMatchEventCreateDto {
 
 
     // @ArrayNotEmpty()
+    @IsMongoId({each: true})
     @IsArray()
     @IsNotEmpty()
-    @IsString({each: true})
-    @IsIn(['toss', 'firstInnings', 'lastInnings'], {each: true})
+    // @IsString({each: true})
+    // @IsIn(acceptedEvents, {each: true})
     readonly events: string[];
 
     @IsString()
