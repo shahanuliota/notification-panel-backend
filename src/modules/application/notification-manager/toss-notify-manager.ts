@@ -50,7 +50,7 @@ export class TossNotifyManager extends INotifyManager {
         const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
         const filteredArray = events.filter(item => item.name != NotificationOptionEnum.toss);
 
-        if (filteredArray) {
+        if (filteredArray.length != 0) {
             return await this.liveMatchEventService.update(this.match._id, {
                 events: filteredArray.map(e => e._id),
                 applications: applications,
