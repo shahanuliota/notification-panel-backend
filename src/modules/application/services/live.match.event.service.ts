@@ -17,6 +17,8 @@ import {EventNameDocument, EventNameEntity} from "../schemas/event-name.schema";
 import {INotifyManager} from "../notification-manager/notify-manager";
 import {DefaultNotifyManager} from "../notification-manager/default-notify-manager";
 import {TossNotifyManager} from "../notification-manager/toss-notify-manager";
+import {FirstInningsNotifyManager} from "../notification-manager/firstInnings-notify-manager";
+import {LastInningsNotifyManager} from "../notification-manager/last-innings-notify-manager";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -207,72 +209,15 @@ export class LiveMatchEventService {
 
             let notifier: INotifyManager = new DefaultNotifyManager();
 
-
             if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
-
                 notifier = new TossNotifyManager(resData, this.triggerEvent, match, this);
-
-                // const event = events.find(e => e.name == NotificationOptionEnum.toss);
-                // const message = event.message || resData.toss.text;
-                // if (message) {
-                //     console.log({message, event});
-                //     await this.triggerEvent.triggerEvents(applications, message, event.header);
-                //     const filteredArray = events.filter(item => item.name != NotificationOptionEnum.toss);
-                //
-                //     return await this.update(match._id, {
-                //         events: filteredArray.map(e => e._id),
-                //         applications: applications,
-                //     });
-                // }
-                // /// if no toss then trigger event after 10 minute
-                // if (resData.status == 1) {
-                //     const targetTime = new Date();
-                //     targetTime.setMinutes(targetTime.getMinutes() + 10);
-                //     return await this.updateScheduleTme(match._id, targetTime);
-                // }
-
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.firstInnings)) {
-                if (resData.status == 1) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 10);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-                /// if match is live then trigger events
-                if (resData.status == 3) {
-                    const message = resData.title + 'match started';
-                    if (resData.title) {
-                        await this.triggerEvent.triggerEvents(applications, message, 'Match Started');
-                    }
-                }
-                /// remove firstInnings event from list
-                const filteredArray = events.filter(item => item.name != NotificationOptionEnum.firstInnings);
-                return await this.update(match._id, {
-                    events: filteredArray.map(e => e._id),
-                    applications: applications,
-                });
 
-                /// after complete first innings
-                if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings) && resData.status == 3) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 40);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-
+                notifier = new FirstInningsNotifyManager(resData, this.triggerEvent, match, this);
 
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
-                /// if match completed
-                if (resData.status == 2) {
-
-                    const message = resData.status_note;
-                    if (resData.message) {
-                        await this.triggerEvent.triggerEvents(applications, message, 'Match Completed');
-                    }
-                    return this.deleteOne({_id: match._id});
-                } else {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 40);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
+                notifier = new LastInningsNotifyManager(resData, this.triggerEvent, match, this);
+                
             }
 
             await notifier.notify();
