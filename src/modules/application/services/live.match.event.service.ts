@@ -194,7 +194,7 @@ export class LiveMatchEventService {
             const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
             const req = this.httpService.get(matchUrl);
             const res = await req.toPromise();
-            // console.log({res: res.data});
+
             const resData = res.data.response;
 
             ///if match Abandoned, canceled, no result

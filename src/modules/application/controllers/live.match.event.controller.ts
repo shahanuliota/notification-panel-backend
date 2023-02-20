@@ -97,8 +97,6 @@ export class LiveMatchEventController {
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
 
 
-        // console.log({list: "list length"});
-        // console.log(list.length);
         for (const v of list) {
             await this.liveMatchEventService.triggerEvents(v);
         }
