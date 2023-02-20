@@ -21,6 +21,7 @@ export class EventNameService {
                 name: data.name,
                 message: data.message,
                 owner: user._id,
+                header: data.header,
             });
 
             await create.save();

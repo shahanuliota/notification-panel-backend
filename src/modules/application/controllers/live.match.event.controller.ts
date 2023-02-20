@@ -97,8 +97,6 @@ export class LiveMatchEventController {
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
 
 
-        // console.log({list: "list length"});
-        // console.log(list.length);
         for (const v of list) {
             await this.liveMatchEventService.triggerEvents(v);
         }
@@ -117,7 +115,7 @@ export class LiveMatchEventController {
     async testCornJob() {
 
         const find = {
-            matchId: 60872
+            matchId: 61011
         };
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
         for (const v of list) {

@@ -13,7 +13,12 @@ import {NotificationOptionEnum} from "../constant/match-event.constant";
 import {HttpService} from "@nestjs/axios";
 import {EventTriggerService} from "./event-trigger.service";
 import {UserService} from "../../user/services/user.service";
-import {EventNameEntity} from "../schemas/event-name.schema";
+import {EventNameDocument, EventNameEntity} from "../schemas/event-name.schema";
+import {INotifyManager} from "../notification-manager/notify-manager";
+import {DefaultNotifyManager} from "../notification-manager/default-notify-manager";
+import {TossNotifyManager} from "../notification-manager/toss-notify-manager";
+import {FirstInningsNotifyManager} from "../notification-manager/firstInnings-notify-manager";
+import {LastInningsNotifyManager} from "../notification-manager/last-innings-notify-manager";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -75,7 +80,7 @@ export class LiveMatchEventService {
             .populate({
                 path: 'events',
                 model: EventNameEntity.name,
-                select: ['_id', 'name', 'message']
+                select: ['_id', 'name', 'message', 'header']
 
             })
         ;
@@ -106,7 +111,7 @@ export class LiveMatchEventService {
         }).populate({
             path: 'events',
             model: EventNameEntity.name,
-            select: ['_id', 'name', 'message']
+            select: ['_id', 'name', 'message', 'header']
 
         });
         return applications.lean();
@@ -173,7 +178,6 @@ export class LiveMatchEventService {
                 await this.updateScheduleTme(match._id, targetTime);
             }
 
-
         } else if (events.includes(NotificationOptionEnum.firstInnings)) {
             await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         } else if (events.includes(NotificationOptionEnum.lastInnings)) {
@@ -186,7 +190,7 @@ export class LiveMatchEventService {
     async triggerEvents(match: MatchEventDocument) {
 
         const dat: any[] = match.events;
-        const events: string[] = dat.map<string>(e => e.name.toString());
+        const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
 
         const applications: string[] = match.applications.map<string>(e => e._id.toString());
         try {
@@ -195,7 +199,7 @@ export class LiveMatchEventService {
             const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
             const req = this.httpService.get(matchUrl);
             const res = await req.toPromise();
-            // console.log({res: res.data});
+
             const resData = res.data.response;
 
             ///if match Abandoned, canceled, no result
@@ -203,78 +207,20 @@ export class LiveMatchEventService {
                 return this.deleteOne({_id: match._id});
             }
 
+            let notifier: INotifyManager = new DefaultNotifyManager();
 
-            // test purpose
-            // if (true) {
-            //     const message = resData.short_title;
-            //     await this.triggerEvent.triggerEvents(applications, message, 'Schedule');
-            //     return this.setNextEvents(match);
-            // }
+            if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
+                notifier = new TossNotifyManager(resData, this.triggerEvent, match, this);
+            } else if (events.map(e => e.name).includes(NotificationOptionEnum.firstInnings)) {
 
+                notifier = new FirstInningsNotifyManager(resData, this.triggerEvent, match, this);
 
-            if (events.includes(NotificationOptionEnum.toss)) {
-
-                const message = resData.toss.text;
-                if (message) {
-                    await this.triggerEvent.triggerEvents(applications, message, 'Toss');
-                    const filteredArray = events.filter(item => item != NotificationOptionEnum.toss);
-                    return await this.update(match._id, {
-                        events: filteredArray,
-                        applications: applications,
-                    });
-                }
-                /// if no toss then trigger event after 10 minute
-                if (resData.status == 1) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 10);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-
-            } else if (events.includes(NotificationOptionEnum.firstInnings)) {
-                if (resData.status == 1) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 10);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-                /// if match is live then trigger events
-                if (resData.status == 3) {
-                    const message = resData.title + 'match started';
-                    if (resData.title) {
-                        await this.triggerEvent.triggerEvents(applications, message, 'Match Started');
-                    }
-                }
-                /// remove firstInnings event from list
-                const filteredArray = events.filter(item => item != NotificationOptionEnum.firstInnings);
-                return await this.update(match._id, {
-                    events: filteredArray,
-                    applications: applications,
-                });
-
-                /// after complete first innings
-                if (events.includes(NotificationOptionEnum.lastInnings) && resData.status == 3) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 40);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-
-
-            } else if (events.includes(NotificationOptionEnum.lastInnings)) {
-
-                /// if match completed
-                if (resData.status == 2) {
-
-                    const message = resData.status_note;
-                    if (resData.message) {
-                        await this.triggerEvent.triggerEvents(applications, message, 'Match Completed');
-                    }
-                    return this.deleteOne({_id: match._id});
-                } else {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 40);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
-
+            } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
+                notifier = new LastInningsNotifyManager(resData, this.triggerEvent, match, this);
+                
             }
+
+            await notifier.notify();
 
         } catch (e) {
             console.log({error: '[triggerEvents] error occurred'});

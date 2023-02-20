@@ -17,6 +17,11 @@ export class EventNameEntity {
 
     })
     message: string;
+    @Prop({
+        required: true,
+        trim: true,
+    })
+    header: string;
 
     @Prop({
         required: true,
