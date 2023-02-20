@@ -115,7 +115,7 @@ export class LiveMatchEventController {
     async testCornJob() {
 
         const find = {
-            matchId: 60872
+            matchId: 61005
         };
         const list: MatchEventDocument[] = await this.liveMatchEventService.findAll<MatchEventDocument>(find);
         for (const v of list) {

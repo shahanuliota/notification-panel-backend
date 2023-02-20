@@ -14,6 +14,9 @@ import {HttpService} from "@nestjs/axios";
 import {EventTriggerService} from "./event-trigger.service";
 import {UserService} from "../../user/services/user.service";
 import {EventNameDocument, EventNameEntity} from "../schemas/event-name.schema";
+import {INotifyManager} from "../notification-manager/notify-manager";
+import {DefaultNotifyManager} from "../notification-manager/default-notify-manager";
+import {TossNotifyManager} from "../notification-manager/toss-notify-manager";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -75,7 +78,7 @@ export class LiveMatchEventService {
             .populate({
                 path: 'events',
                 model: EventNameEntity.name,
-                select: ['_id', 'name', 'message']
+                select: ['_id', 'name', 'message', 'header']
 
             })
         ;
@@ -106,7 +109,7 @@ export class LiveMatchEventService {
         }).populate({
             path: 'events',
             model: EventNameEntity.name,
-            select: ['_id', 'name', 'message']
+            select: ['_id', 'name', 'message', 'header']
 
         });
         return applications.lean();
@@ -202,31 +205,31 @@ export class LiveMatchEventService {
                 return this.deleteOne({_id: match._id});
             }
 
-
-            // test purpose
-            // if (true) {
-            //     const message = resData.short_title;
-            //     await this.triggerEvent.triggerEvents(applications, message, 'Schedule');
-            //     return this.setNextEvents(match);
-            // }
+            let notifier: INotifyManager = new DefaultNotifyManager();
 
 
             if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
-                const message = resData.toss.text;
-                if (message) {
-                    await this.triggerEvent.triggerEvents(applications, message, 'Toss');
-                    const filteredArray = events.filter(item => item.name != NotificationOptionEnum.toss);
-                    return await this.update(match._id, {
-                        events: filteredArray.map(e => e._id),
-                        applications: applications,
-                    });
-                }
-                /// if no toss then trigger event after 10 minute
-                if (resData.status == 1) {
-                    const targetTime = new Date();
-                    targetTime.setMinutes(targetTime.getMinutes() + 10);
-                    return await this.updateScheduleTme(match._id, targetTime);
-                }
+
+                notifier = new TossNotifyManager(resData, this.triggerEvent, match, this);
+
+                // const event = events.find(e => e.name == NotificationOptionEnum.toss);
+                // const message = event.message || resData.toss.text;
+                // if (message) {
+                //     console.log({message, event});
+                //     await this.triggerEvent.triggerEvents(applications, message, event.header);
+                //     const filteredArray = events.filter(item => item.name != NotificationOptionEnum.toss);
+                //
+                //     return await this.update(match._id, {
+                //         events: filteredArray.map(e => e._id),
+                //         applications: applications,
+                //     });
+                // }
+                // /// if no toss then trigger event after 10 minute
+                // if (resData.status == 1) {
+                //     const targetTime = new Date();
+                //     targetTime.setMinutes(targetTime.getMinutes() + 10);
+                //     return await this.updateScheduleTme(match._id, targetTime);
+                // }
 
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.firstInnings)) {
                 if (resData.status == 1) {
@@ -270,8 +273,9 @@ export class LiveMatchEventService {
                     targetTime.setMinutes(targetTime.getMinutes() + 40);
                     return await this.updateScheduleTme(match._id, targetTime);
                 }
-
             }
+
+            await notifier.notify();
 
         } catch (e) {
             console.log({error: '[triggerEvents] error occurred'});

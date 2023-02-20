@@ -12,4 +12,7 @@ export class EventNameCreateDto {
     @IsString()
     @IsNotEmpty()
     message: string;
+    @IsString()
+    @IsNotEmpty()
+    header: string;
 }
