@@ -13,7 +13,7 @@ import {NotificationOptionEnum} from "../constant/match-event.constant";
 import {HttpService} from "@nestjs/axios";
 import {EventTriggerService} from "./event-trigger.service";
 import {UserService} from "../../user/services/user.service";
-import {EventNameEntity} from "../schemas/event-name.schema";
+import {EventNameDocument, EventNameEntity} from "../schemas/event-name.schema";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -173,7 +173,6 @@ export class LiveMatchEventService {
                 await this.updateScheduleTme(match._id, targetTime);
             }
 
-
         } else if (events.includes(NotificationOptionEnum.firstInnings)) {
             await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         } else if (events.includes(NotificationOptionEnum.lastInnings)) {
@@ -186,7 +185,7 @@ export class LiveMatchEventService {
     async triggerEvents(match: MatchEventDocument) {
 
         const dat: any[] = match.events;
-        const events: string[] = dat.map<string>(e => e.name.toString());
+        const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
 
         const applications: string[] = match.applications.map<string>(e => e._id.toString());
         try {
@@ -212,14 +211,13 @@ export class LiveMatchEventService {
             // }
 
 
-            if (events.includes(NotificationOptionEnum.toss)) {
-
+            if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
                 const message = resData.toss.text;
                 if (message) {
                     await this.triggerEvent.triggerEvents(applications, message, 'Toss');
-                    const filteredArray = events.filter(item => item != NotificationOptionEnum.toss);
+                    const filteredArray = events.filter(item => item.name != NotificationOptionEnum.toss);
                     return await this.update(match._id, {
-                        events: filteredArray,
+                        events: filteredArray.map(e => e._id),
                         applications: applications,
                     });
                 }
@@ -230,7 +228,7 @@ export class LiveMatchEventService {
                     return await this.updateScheduleTme(match._id, targetTime);
                 }
 
-            } else if (events.includes(NotificationOptionEnum.firstInnings)) {
+            } else if (events.map(e => e.name).includes(NotificationOptionEnum.firstInnings)) {
                 if (resData.status == 1) {
                     const targetTime = new Date();
                     targetTime.setMinutes(targetTime.getMinutes() + 10);
@@ -244,22 +242,21 @@ export class LiveMatchEventService {
                     }
                 }
                 /// remove firstInnings event from list
-                const filteredArray = events.filter(item => item != NotificationOptionEnum.firstInnings);
+                const filteredArray = events.filter(item => item.name != NotificationOptionEnum.firstInnings);
                 return await this.update(match._id, {
-                    events: filteredArray,
+                    events: filteredArray.map(e => e._id),
                     applications: applications,
                 });
 
                 /// after complete first innings
-                if (events.includes(NotificationOptionEnum.lastInnings) && resData.status == 3) {
+                if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings) && resData.status == 3) {
                     const targetTime = new Date();
                     targetTime.setMinutes(targetTime.getMinutes() + 40);
                     return await this.updateScheduleTme(match._id, targetTime);
                 }
 
 
-            } else if (events.includes(NotificationOptionEnum.lastInnings)) {
-
+            } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
                 /// if match completed
                 if (resData.status == 2) {
 
