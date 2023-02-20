@@ -165,19 +165,27 @@ export class LiveMatchEventService {
 
     async triggerEvents(match: MatchEventDocument) {
         const events: string[] = match.events;
-        const applications: string[] = match.applications.map(e => e.toString());
+        const applications: string[] = match.applications.map<string>(e => e._id.toString());
         try {
+            console.log('triggerEvents called with match id ' + match.matchId);
             const user = await this.userService.findOne<IUserDocument>({email: 'admin@mail.com'});
             const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
             const req = this.httpService.get(matchUrl);
             const res = await req.toPromise();
-            console.log({res});
+            // console.log({res: res.data});
             const resData = res.data.response;
 
             ///if match Abandoned, canceled, no result
             if (resData.status == 4) {
                 return this.deleteOne({_id: match._id});
             }
+
+            /// test purpose
+            // if (true) {
+            //     const message = resData.short_title;
+            //     await this.triggerEvent.triggerEvents(applications, message, 'Schedule');
+            //     return this.setNextEvents(match);
+            // }
 
 
             if (events.includes(NotificationOptionEnum.toss)) {

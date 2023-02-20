@@ -47,7 +47,7 @@ export class EventNameController {
     }
 
 
-    @Response('application.get',)
+    @Response('application.get')
     @EventNameGetGuard()
     @RequestParamGuard(OnlyIDParamDTO)
     @AuthAdminJwtGuard(ENUM_AUTH_PERMISSIONS.APPLICATION_READ)
