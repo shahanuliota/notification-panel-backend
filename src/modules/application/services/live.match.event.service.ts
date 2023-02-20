@@ -191,15 +191,12 @@ export class LiveMatchEventService {
 
         const dat: any[] = match.events;
         const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
-
-        const applications: string[] = match.applications.map<string>(e => e._id.toString());
         try {
             console.log('triggerEvents called with match id ' + match.matchId);
             const user = await this.userService.findOne<IUserDocument>({email: 'admin@mail.com'});
             const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
             const req = this.httpService.get(matchUrl);
             const res = await req.toPromise();
-
             const resData = res.data.response;
 
             ///if match Abandoned, canceled, no result
@@ -217,7 +214,7 @@ export class LiveMatchEventService {
 
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
                 notifier = new LastInningsNotifyManager(resData, this.triggerEvent, match, this);
-                
+
             }
 
             await notifier.notify();
