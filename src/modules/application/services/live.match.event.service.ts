@@ -105,7 +105,7 @@ export class LiveMatchEventService {
 
         }).populate({
             path: 'events',
-            model: ApplicationEntity.name,
+            model: EventNameEntity.name,
             select: ['_id', 'name', 'message']
 
         });
