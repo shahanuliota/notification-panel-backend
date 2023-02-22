@@ -19,6 +19,7 @@ import {DefaultNotifyManager} from "../notification-manager/default-notify-manag
 import {TossNotifyManager} from "../notification-manager/toss-notify-manager";
 import {FirstInningsNotifyManager} from "../notification-manager/firstInnings-notify-manager";
 import {LastInningsNotifyManager} from "../notification-manager/last-innings-notify-manager";
+import {TimeIntervalNotifyManager} from "../notification-manager/time-interval-notify-manager";
 
 @Injectable()
 export class LiveMatchEventService {
@@ -205,6 +206,12 @@ export class LiveMatchEventService {
             }
 
             let notifier: INotifyManager = new DefaultNotifyManager();
+
+            if (events.map(e => e.name).includes(NotificationOptionEnum.timeInterval)) {
+                notifier = new TimeIntervalNotifyManager(resData, this.triggerEvent, match, this);
+                await notifier.notify();
+            }
+
 
             if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
                 notifier = new TossNotifyManager(resData, this.triggerEvent, match, this);
