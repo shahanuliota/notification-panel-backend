@@ -23,7 +23,7 @@ export class TimeIntervalNotifyManager extends INotifyManager {
         if (event) {
             if (this.response.status == 2) {
                 if (this.response.game_state == 3) {
-                    const message = `${this.response.status_note} ${event.message}`;
+                    const message = `${this.response.status_note}`;
                     await this.triggerNotification(message, event.header);
                 }
             }
