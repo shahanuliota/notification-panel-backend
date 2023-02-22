@@ -1,4 +1,4 @@
-import {IsIn, IsNotEmpty, IsString} from "class-validator";
+import {IsIn, IsNotEmpty, IsOptional, IsString} from "class-validator";
 import {acceptedEvents} from "../constant/match-event.constant";
 
 export class EventNameCreateDto {
@@ -10,7 +10,7 @@ export class EventNameCreateDto {
 
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     message: string;
     @IsString()
     @IsNotEmpty()
