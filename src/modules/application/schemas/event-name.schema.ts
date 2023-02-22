@@ -11,8 +11,7 @@ export class EventNameEntity {
     })
     name: string;
     @Prop({
-        required: true,
-
+        required: false,
         trim: true,
 
     })

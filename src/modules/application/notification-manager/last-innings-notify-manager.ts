@@ -22,9 +22,9 @@ export class LastInningsNotifyManager extends INotifyManager {
         if (event) {
 
             if (this.response.status == 2) {
-                const message = event.message || this.response.status_note;
+                // const message = event.message || this.response.status_note;
+                const message = `${this.response.status_note} ${event.message}`;
                 await this.triggerNotification(message, event.header);
-
             } else {
                 return this.updateEventTime();
             }

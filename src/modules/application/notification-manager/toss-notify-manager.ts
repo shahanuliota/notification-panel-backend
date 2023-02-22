@@ -24,7 +24,8 @@ export class TossNotifyManager extends INotifyManager {
 
 
         if (event) {
-            const message = event.message || this.response.toss.text;
+            // const message = event.message || this.response.toss.text;
+            const message = `${this.response.toss.text}  ${event.message}`;
             if (this.response.toss.text) {
                 await this.triggerNotification(message, event.header);
             } else {
