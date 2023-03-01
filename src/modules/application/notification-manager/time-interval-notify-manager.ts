@@ -23,8 +23,6 @@ export class TimeIntervalNotifyManager extends INotifyManager {
         if (event) {
 
 
-            const liveMatchEvent = [];
-
             /// match live
             if (this.response.status == 3) {
                 if (this.response.game_state == 3) {

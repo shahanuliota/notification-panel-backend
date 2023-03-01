@@ -27,7 +27,10 @@ export class LastInningsNotifyManager extends INotifyManager {
                 if (this.response.latest_inning_number == 2 && this.response.game_state == 3) {
                     const message = `${this.response.status_note} ${event.message}`;
                     await this.triggerNotification(message, event.header);
+                } else {
+                    return this.updateEventTime();
                 }
+
                 // const message = event.message || this.response.status_note;
 
             } else {
