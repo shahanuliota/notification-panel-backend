@@ -31,7 +31,7 @@ export class FirstInningsNotifyManager extends INotifyManager {
             /// if match started
             else if (this.response.status == 3) {
                 // const message = event.message || this.response.title + 'match started';
-                const message = `${this.response.title}  ${event.message}`;
+                const message = `${this.response.title} - ${this.response.subtitle} ${event.message}`;
                 return this.triggerNotification(message, event.header);
             }
 

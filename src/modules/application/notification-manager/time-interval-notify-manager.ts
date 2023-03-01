@@ -21,12 +21,35 @@ export class TimeIntervalNotifyManager extends INotifyManager {
         const event = events.find(e => e.name == NotificationOptionEnum.timeInterval);
 
         if (event) {
-            if (this.response.status == 2) {
-                if (this.response.game_state == 3) {
-                    const message = `${this.response.status_note}`;
-                    await this.triggerNotification(message, event.header);
+            if (this.response.status == 3) {
+                // if (this.response.game_state == 3) {
+                //     const message = `${this.response.status_note}`;
+                //     return await this.triggerNotification(message, event.header);
+                // }
+
+                let winnerTeam = this.response.teama;
+                if (this.response.toss.decision == 1) {
+                    winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teama : this.response.teamb;
+                } else {
+                    winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teamb : this.response.teama;
+
                 }
+
+                let currentTeam = winnerTeam;
+                if (this.response.latest_inning_number == 1) {
+                    currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teama : this.response.teamb;
+                } else {
+                    currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teamb : this.response.teama;
+                }
+
+
+                const message = `${currentTeam.name} - ${currentTeam.scores_full}`;
+                return await this.triggerNotification(message, event.header);
+            } else if (this.response.status == 2) {
+                return this.deleteIfNeeded();
             }
+
+
         }
         return Promise.resolve(undefined);
     }

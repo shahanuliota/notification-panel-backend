@@ -165,7 +165,7 @@ export class LiveMatchEventService {
         if (events.includes(NotificationOptionEnum.toss)) {
 
 
-            targetTime.setMinutes(targetTime.getMinutes() - 30);
+            targetTime.setMinutes(targetTime.getMinutes() - 29);
             console.log({targetTime});
             const differenceInMs = targetTime.getTime() - now.getTime();
 
@@ -182,7 +182,7 @@ export class LiveMatchEventService {
         } else if (events.includes(NotificationOptionEnum.firstInnings)) {
             await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         } else if (events.includes(NotificationOptionEnum.lastInnings)) {
-
+            await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         }
 
         return;
@@ -220,9 +220,12 @@ export class LiveMatchEventService {
                 notifier = new FirstInningsNotifyManager(resData, this.triggerEvent, match, this);
 
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
+
+                /// last innings started
                 notifier = new LastInningsNotifyManager(resData, this.triggerEvent, match, this);
 
             }
+
 
             await notifier.notify();
 
