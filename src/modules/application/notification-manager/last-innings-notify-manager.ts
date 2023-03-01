@@ -48,7 +48,7 @@ export class LastInningsNotifyManager extends INotifyManager {
     private async updateEventTime() {
         const targetTime = new Date();
 
-        targetTime.setMinutes(targetTime.getMinutes() + 30);
+        targetTime.setMinutes(targetTime.getMinutes() + 10);
         return await this.liveMatchEventService.updateScheduleTme(this.match._id, targetTime);
     }
 

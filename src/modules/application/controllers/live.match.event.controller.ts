@@ -113,11 +113,9 @@ export class LiveMatchEventController {
 
     @Get('test')
     async testCornJob() {
-
         const find = {
             matchId: 61038
         };
-        
 
         console.log("test message");
         console.log("" || "test");
