@@ -201,7 +201,7 @@ export class LiveMatchEventService {
             const resData = res.data.response;
 
             ///if match Abandoned, canceled, no result
-            if (resData.status == 4) {
+            if (resData.status == 4 || resData.status == 2) {
                 return this.deleteOne({_id: match._id});
             }
 

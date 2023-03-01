@@ -27,7 +27,10 @@ export class LastInningsNotifyManager extends INotifyManager {
                 if (this.response.latest_inning_number == 2 && this.response.game_state == 3) {
                     const message = `${this.response.status_note} ${event.message}`;
                     await this.triggerNotification(message, event.header);
+                } else {
+                    return this.updateEventTime();
                 }
+
                 // const message = event.message || this.response.status_note;
 
             } else {
@@ -48,7 +51,7 @@ export class LastInningsNotifyManager extends INotifyManager {
     private async updateEventTime() {
         const targetTime = new Date();
 
-        targetTime.setMinutes(targetTime.getMinutes() + 30);
+        targetTime.setMinutes(targetTime.getMinutes() + 10);
         return await this.liveMatchEventService.updateScheduleTme(this.match._id, targetTime);
     }
 

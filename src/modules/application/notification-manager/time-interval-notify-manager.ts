@@ -21,27 +21,23 @@ export class TimeIntervalNotifyManager extends INotifyManager {
         const event = events.find(e => e.name == NotificationOptionEnum.timeInterval);
 
         if (event) {
+
+
             /// match live
             if (this.response.status == 3) {
                 if (this.response.game_state == 3) {
-                    let winnerTeam = this.response.teama;
-                    if (this.response.toss.decision == 1) {
-                        winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teama : this.response.teamb;
-                    } else {
-                        winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teamb : this.response.teama;
 
-                    }
-
-                    let currentTeam = winnerTeam;
-                    if (this.response.latest_inning_number == 1) {
-                        currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teama : this.response.teamb;
-                    } else {
-                        currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teamb : this.response.teama;
-                    }
-
-
+                    const currentTeam = this.getCurrentTeam();
                     const message = `${currentTeam.name} - ${currentTeam.scores_full}`;
                     return await this.triggerNotification(message, event.header);
+                } else {
+
+                    const lastInnings = events.find(e => e.name == NotificationOptionEnum.lastInnings);
+                    if (!lastInnings) {
+                        return this.updateEventTime();
+                    }
+
+
                 }
 
 
@@ -58,6 +54,24 @@ export class TimeIntervalNotifyManager extends INotifyManager {
 
     async deleteIfNeeded() {
         return this.liveMatchEventService.deleteOne({_id: this.match._id});
+    }
+
+    private getCurrentTeam() {
+        let winnerTeam = this.response.teama;
+        if (this.response.toss.decision == 1) {
+            winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teama : this.response.teamb;
+        } else {
+            winnerTeam = this.response.teama.team_id == this.response.toss.winner ? this.response.teamb : this.response.teama;
+
+        }
+
+        let currentTeam = winnerTeam;
+        if (this.response.latest_inning_number == 1) {
+            currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teama : this.response.teamb;
+        } else {
+            currentTeam = winnerTeam.team_id == this.response.teama.team_id ? this.response.teamb : this.response.teama;
+        }
+        return currentTeam;
     }
 
     private async triggerNotification(message: string, header: string) {
@@ -90,13 +104,31 @@ export class TimeIntervalNotifyManager extends INotifyManager {
 
     }
 
+
+    private getMatTimeLeft(): number {
+        const dat: any[] = this.match.events;
+        const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
+        const event = events.find(e => e.name == NotificationOptionEnum.timeInterval);
+        const time: number = parseInt(event.message);
+
+        const currentTeam = this.getCurrentTeam();
+        const overs: number = parseInt(currentTeam.overs);
+        if (overs) {
+            const overTime: number = overs * 3;
+            return time < overTime ? time : overTime;
+        }
+
+        return time;
+    }
+
     private async updateEventTime() {
         const targetTime = new Date();
         try {
-            const dat: any[] = this.match.events;
-            const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
-            const event = events.find(e => e.name == NotificationOptionEnum.timeInterval);
-            const time: number = parseInt(event.message);
+            // const dat: any[] = this.match.events;
+            // const events: EventNameDocument[] = dat.map<EventNameDocument>(e => e);
+            // const event = events.find(e => e.name == NotificationOptionEnum.timeInterval);
+            // const time: number = parseInt(event.message);
+            const time: number = this.getMatTimeLeft();
             targetTime.setMinutes(targetTime.getMinutes() + time);
             return await this.liveMatchEventService.updateScheduleTme(this.match._id, targetTime);
 
