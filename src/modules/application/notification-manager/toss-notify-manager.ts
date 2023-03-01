@@ -78,7 +78,7 @@ export class TossNotifyManager extends INotifyManager {
 
     private async updateEventTime() {
         const targetTime = new Date();
-        targetTime.setMinutes(targetTime.getMinutes() + 10);
+        targetTime.setMinutes(targetTime.getMinutes() + 3);
         return await this.liveMatchEventService.updateScheduleTme(this.match._id, targetTime);
     }
 }

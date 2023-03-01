@@ -5,6 +5,7 @@ import {INotifyManager} from "./notify-manager";
 import {EventNameDocument} from "../schemas/event-name.schema";
 import {NotificationOptionEnum} from "../constant/match-event.constant";
 
+/// last innings started
 export class LastInningsNotifyManager extends INotifyManager {
     constructor(
         private readonly response: any,
@@ -21,10 +22,14 @@ export class LastInningsNotifyManager extends INotifyManager {
         const event = events.find(e => e.name == NotificationOptionEnum.lastInnings);
         if (event) {
 
-            if (this.response.status == 2) {
+            if (this.response.status == 3) {
+
+                if (this.response.latest_inning_number == 2 && this.response.game_state == 3) {
+                    const message = `${this.response.status_note} ${event.message}`;
+                    await this.triggerNotification(message, event.header);
+                }
                 // const message = event.message || this.response.status_note;
-                const message = `${this.response.status_note} ${event.message}`;
-                await this.triggerNotification(message, event.header);
+
             } else {
                 return this.updateEventTime();
             }
@@ -43,7 +48,7 @@ export class LastInningsNotifyManager extends INotifyManager {
     private async updateEventTime() {
         const targetTime = new Date();
 
-        targetTime.setMinutes(targetTime.getMinutes() + 40);
+        targetTime.setMinutes(targetTime.getMinutes() + 30);
         return await this.liveMatchEventService.updateScheduleTme(this.match._id, targetTime);
     }
 

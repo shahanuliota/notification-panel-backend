@@ -165,7 +165,7 @@ export class LiveMatchEventService {
         if (events.includes(NotificationOptionEnum.toss)) {
 
 
-            targetTime.setMinutes(targetTime.getMinutes() - 30);
+            targetTime.setMinutes(targetTime.getMinutes() - 29);
             console.log({targetTime});
             const differenceInMs = targetTime.getTime() - now.getTime();
 
@@ -182,7 +182,7 @@ export class LiveMatchEventService {
         } else if (events.includes(NotificationOptionEnum.firstInnings)) {
             await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         } else if (events.includes(NotificationOptionEnum.lastInnings)) {
-
+            await this.updateScheduleTme(match._id, differenceInMs < 0 ? now : targetTime);
         }
 
         return;
@@ -207,11 +207,6 @@ export class LiveMatchEventService {
 
             let notifier: INotifyManager = new DefaultNotifyManager();
 
-            if (events.map(e => e.name).includes(NotificationOptionEnum.timeInterval)) {
-                notifier = new TimeIntervalNotifyManager(resData, this.triggerEvent, match, this);
-                await notifier.notify();
-            }
-
 
             if (events.map(e => e.name).includes(NotificationOptionEnum.toss)) {
                 notifier = new TossNotifyManager(resData, this.triggerEvent, match, this);
@@ -219,7 +214,12 @@ export class LiveMatchEventService {
 
                 notifier = new FirstInningsNotifyManager(resData, this.triggerEvent, match, this);
 
+            } else if (events.map(e => e.name).includes(NotificationOptionEnum.timeInterval)) {
+                notifier = new TimeIntervalNotifyManager(resData, this.triggerEvent, match, this);
+                //  await notifier.notify();
             } else if (events.map(e => e.name).includes(NotificationOptionEnum.lastInnings)) {
+
+                /// last innings started
                 notifier = new LastInningsNotifyManager(resData, this.triggerEvent, match, this);
 
             }
