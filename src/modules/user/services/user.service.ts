@@ -166,7 +166,10 @@ export class UserService {
         user.lastName = lastName || undefined;
         user.apiToken = apiToken || user.apiToken;
         user.userAuthKey = userAuthKey || user.userAuthKey;
-        return user.save();
+        await user.save();
+        return {
+            ...user['_doc'],
+        };
     }
 
     async checkExist(

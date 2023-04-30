@@ -347,9 +347,7 @@ export class UserController {
         };
     }
 
-    @Response('user.profile', {
-        classSerialization: UserProfileSerialization,
-    })
+    @Response('user.profile')
     @UserProfileGuard()
     @AuthJwtGuard()
     @Post('/profile/update')
@@ -359,7 +357,13 @@ export class UserController {
         body: UserUpdateDto
     ): Promise<IResponse> {
         try {
-            return await this.userService.updateOneById(user._id, body);
+            const u: UserDocument = await this.userService.updateOneById(
+                user._id,
+                body
+            );
+            delete u.password;
+            delete u.salt;
+            return u;
         } catch (err: any) {
             throw new InternalServerErrorException({
                 statusCode: ENUM_ERROR_STATUS_CODE_ERROR.ERROR_UNKNOWN,
