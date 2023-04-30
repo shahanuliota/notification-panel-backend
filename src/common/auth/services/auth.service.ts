@@ -3,8 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { HelperDateService } from 'src/common/helper/services/helper.date.service';
 import { HelperEncryptionService } from 'src/common/helper/services/helper.encryption.service';
 import { HelperHashService } from 'src/common/helper/services/helper.hash.service';
-import { IAuthRefreshTokenOptions } from '../auth.interface';
-import { IAuthPassword, IAuthPayloadOptions } from '../auth.interface';
+import {
+    IAuthPassword,
+    IAuthPayloadOptions,
+    IAuthRefreshTokenOptions,
+} from '../auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -183,11 +186,7 @@ export class AuthService {
             date: passwordExpired,
         });
 
-        if (today > passwordExpiredConvert) {
-            return true;
-        }
-
-        return false;
+        return today > passwordExpiredConvert;
     }
 
     async getTokenType(): Promise<string> {
