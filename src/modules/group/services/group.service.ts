@@ -1,34 +1,34 @@
-import {Injectable} from "@nestjs/common";
-import {DatabaseEntity} from "../../../common/database/decorators/database.decorator";
-import {Model} from "mongoose";
-import {AppGroupDocument, AppGroupEntity} from "../schemas/app-groups.schema";
-import {GroupCreateDto} from "../dtos/create.group.dto";
-import {IUserDocument} from "../../user/user.interface";
-import {IDatabaseFindAllOptions} from "../../../common/database/database.interface";
-import {GroupUpdateDto} from "../dtos/update.group.dto";
+import { Injectable } from '@nestjs/common';
+import { DatabaseEntity } from '../../../common/database/decorators/database.decorator';
+import { Model } from 'mongoose';
+import { AppGroupDocument, AppGroupEntity } from '../schemas/app-groups.schema';
+import { GroupCreateDto } from '../dtos/create.group.dto';
+import { IUserDocument } from '../../user/user.interface';
+import { IDatabaseFindAllOptions } from '../../../common/database/database.interface';
+import { GroupUpdateDto } from '../dtos/update.group.dto';
 
 @Injectable()
 export class GroupService {
     constructor(
         @DatabaseEntity(AppGroupEntity.name)
         private readonly groupModel: Model<AppGroupDocument>
-    ) {
-    }
+    ) {}
 
-
-    async create(data: GroupCreateDto, user: IUserDocument): Promise<AppGroupDocument> {
+    async create(
+        data: GroupCreateDto,
+        user: IUserDocument
+    ): Promise<AppGroupDocument> {
         try {
             const create: AppGroupDocument = new this.groupModel({
                 name: data.name,
                 description: data.description,
                 isActive: data.isActive || true,
-                owner: user._id
+                owner: user._id,
             });
 
             return create.save();
         } catch (e) {
-
-            console.log(e);
+            //console.log(e);
             throw e;
         }
     }
@@ -70,7 +70,7 @@ export class GroupService {
 
     async update(
         _id: string,
-        {name, description}: GroupUpdateDto
+        { name, description }: GroupUpdateDto
     ): Promise<AppGroupDocument> {
         const group = await this.groupModel.findById(_id);
 
@@ -80,19 +80,16 @@ export class GroupService {
     }
 
     async inactive(_id: string): Promise<AppGroupDocument> {
-        const group: AppGroupDocument =
-            await this.groupModel.findById(_id);
+        const group: AppGroupDocument = await this.groupModel.findById(_id);
 
         group.isActive = false;
         return group.save();
     }
 
     async active(_id: string): Promise<AppGroupDocument> {
-        const group: AppGroupDocument =
-            await this.groupModel.findById(_id);
+        const group: AppGroupDocument = await this.groupModel.findById(_id);
 
         group.isActive = true;
         return group.save();
     }
-
 }

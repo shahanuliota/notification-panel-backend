@@ -365,6 +365,8 @@ describe('E2E User Admin', () => {
             .send({
                 firstName: faker.name.firstName(),
                 lastName: faker.name.lastName(),
+                userAuthKey: 'userAuthKey',
+                apiToken: 'apiToken',
             })
             .expect(200);
 

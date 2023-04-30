@@ -1,18 +1,21 @@
-import {Injectable} from '@nestjs/common';
-import {Model, Types} from 'mongoose';
-import {ConfigService} from '@nestjs/config';
-import {UserDocument, UserEntity} from '../schemas/user.schema';
-import {HelperStringService} from 'src/common/helper/services/helper.string.service';
-import {IDatabaseFindAllOptions, IDatabaseFindOneOptions,} from 'src/common/database/database.interface';
-import {IUserCheckExist, IUserCreate, IUserDocument} from '../user.interface';
-import {RoleEntity} from 'src/modules/role/schemas/role.schema';
-import {PermissionEntity} from 'src/modules/permission/schemas/permission.schema';
-import {UserUpdateDto} from '../dtos/user.update.dto';
-import {IAuthPassword} from 'src/common/auth/auth.interface';
-import {DatabaseEntity} from 'src/common/database/decorators/database.decorator';
-import {plainToInstance} from 'class-transformer';
-import {UserPayloadSerialization} from '../serializations/user.payload.serialization';
-import {IAwsS3} from 'src/common/aws/aws.interface';
+import { Injectable } from '@nestjs/common';
+import { Model, Types } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
+import { UserDocument, UserEntity } from '../schemas/user.schema';
+import { HelperStringService } from 'src/common/helper/services/helper.string.service';
+import {
+    IDatabaseFindAllOptions,
+    IDatabaseFindOneOptions,
+} from 'src/common/database/database.interface';
+import { IUserCheckExist, IUserCreate, IUserDocument } from '../user.interface';
+import { RoleEntity } from 'src/modules/role/schemas/role.schema';
+import { PermissionEntity } from 'src/modules/permission/schemas/permission.schema';
+import { UserUpdateDto } from '../dtos/user.update.dto';
+import { IAuthPassword } from 'src/common/auth/auth.interface';
+import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
+import { plainToInstance } from 'class-transformer';
+import { UserPayloadSerialization } from '../serializations/user.payload.serialization';
+import { IAwsS3 } from 'src/common/aws/aws.interface';
 
 @Injectable()
 export class UserService {
@@ -116,18 +119,17 @@ export class UserService {
     }
 
     async create({
-                     firstName,
-                     lastName,
-                     password,
-                     passwordExpired,
-                     salt,
-                     email,
-                     mobileNumber,
-                     role,
-                     userAuthKey,
-                     apiToken,
-
-                 }: IUserCreate): Promise<UserDocument> {
+        firstName,
+        lastName,
+        password,
+        passwordExpired,
+        salt,
+        email,
+        mobileNumber,
+        role,
+        userAuthKey,
+        apiToken,
+    }: IUserCreate): Promise<UserDocument> {
         const user: UserEntity = {
             firstName,
             email,
@@ -156,13 +158,14 @@ export class UserService {
 
     async updateOneById(
         _id: string,
-        {firstName, lastName}: UserUpdateDto
+        { firstName, lastName, apiToken, userAuthKey }: UserUpdateDto
     ): Promise<UserDocument> {
         const user: UserDocument = await this.userModel.findById(_id);
 
         user.firstName = firstName;
         user.lastName = lastName || undefined;
-
+        user.apiToken = apiToken || user.apiToken;
+        user.userAuthKey = userAuthKey || user.userAuthKey;
         return user.save();
     }
 
@@ -176,13 +179,13 @@ export class UserService {
                 $regex: new RegExp(email),
                 $options: 'i',
             },
-            _id: {$nin: [new Types.ObjectId(_id)]},
+            _id: { $nin: [new Types.ObjectId(_id)] },
         });
 
         const existMobileNumber: Record<string, any> =
             await this.userModel.exists({
                 mobileNumber,
-                _id: {$nin: [new Types.ObjectId(_id)]},
+                _id: { $nin: [new Types.ObjectId(_id)] },
             });
 
         return {
@@ -209,7 +212,7 @@ export class UserService {
 
     async updatePassword(
         _id: string,
-        {salt, passwordHash, passwordExpired}: IAuthPassword
+        { salt, passwordHash, passwordExpired }: IAuthPassword
     ): Promise<UserDocument> {
         const auth: UserDocument = await this.userModel.findById(_id);
 
