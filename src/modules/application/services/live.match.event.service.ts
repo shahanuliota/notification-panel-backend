@@ -43,9 +43,21 @@ export class LiveMatchEventService {
         user: IUserDocument
     ): Promise<MatchEventDocument> {
         try {
-            const date = new Date(dto.startTime * 1000);
+            let date = new Date(dto.startTime * 1000);
             /// compare date
             //            date.setMinutes(date.getMinutes() - 3);
+
+            // if start time is in past
+
+            const currentTime = new Date();
+            if (date < currentTime) {
+                // Start time is in the past
+                const currentTimePlus2Minutes = new Date(
+                    currentTime.getTime() + 2 * 60 * 1000
+                );
+                date = currentTimePlus2Minutes;
+            } else {
+            }
 
             const create: MatchEventDocument =
                 new this.matchEventModel<MatchEventEntity>({
