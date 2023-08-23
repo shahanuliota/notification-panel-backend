@@ -191,7 +191,10 @@ export class LiveMatchEventService {
                 const currentTimePlus2Minutes = new Date(
                     date.getTime() + parseInt(eventName.message) * 60 * 1000
                 );
-                update['scheduleForInterVal'] = currentTimePlus2Minutes;
+
+                if (!matchData.scheduleForInterVal) {
+                    update['scheduleForInterVal'] = currentTimePlus2Minutes;
+                }
             }
         }
 
@@ -208,6 +211,16 @@ export class LiveMatchEventService {
     async updateScheduleTme(_id: string, time: Date) {
         const update = {
             schedule: time,
+        };
+        await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>(
+            { _id },
+            update
+        );
+    }
+
+    async updateScheduleTmeFroInterval(_id: string, time: Date) {
+        const update = {
+            scheduleForInterVal: time,
         };
         await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>(
             { _id },
@@ -312,8 +325,38 @@ export class LiveMatchEventService {
             }
 
             await notifier.notify();
+        } catch (e) {
+            console.log({ error: '[triggerEvents] error occurred' });
+            console.log({ e });
+        }
+
+        return;
+    }
+
+    async triggerIntervalEvents(match: MatchEventDocument) {
+        const dat: any[] = match.events;
+        const events: EventNameDocument[] = dat.map<EventNameDocument>(
+            (e) => e
+        );
+        try {
+            console.log(
+                'triggerIntervalEvents called with match id ' + match.matchId
+            );
+            const user = await this.userService.findOne<IUserDocument>({
+                email: 'admin@mail.com',
+            });
+            const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
+            const req = this.httpService.get(matchUrl);
+            const res = await req.toPromise();
+            const resData = res.data.response;
+
+            ///if match Abandoned, canceled, no result
+            if (resData.status == 4 || resData.status == 2) {
+                return this.deleteOne({ _id: match._id });
+            }
 
             //time interval
+            let notifier: INotifyManager = new DefaultNotifyManager();
             if (
                 events
                     .map((e) => e.name)
@@ -328,7 +371,7 @@ export class LiveMatchEventService {
                 await notifier.notify();
             }
         } catch (e) {
-            console.log({ error: '[triggerEvents] error occurred' });
+            console.log({ error: '[triggerIntervalEvents] error occurred' });
             console.log({ e });
         }
 
