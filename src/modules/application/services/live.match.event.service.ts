@@ -25,6 +25,7 @@ import { DefaultNotifyManager } from '../notification-manager/default-notify-man
 import { TossNotifyManager } from '../notification-manager/toss-notify-manager';
 import { FirstInningsNotifyManager } from '../notification-manager/firstInnings-notify-manager';
 import { LastInningsNotifyManager } from '../notification-manager/last-innings-notify-manager';
+import { EventNameService } from './event-name.service';
 import { TimeIntervalNotifyManager } from '../notification-manager/time-interval-notify-manager';
 
 @Injectable()
@@ -34,7 +35,8 @@ export class LiveMatchEventService {
         private readonly matchEventModel: Model<MatchEventDocument>,
         private readonly httpService: HttpService,
         private readonly triggerEvent: EventTriggerService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly eventNameService: EventNameService
     ) {}
 
     async create(
@@ -43,24 +45,51 @@ export class LiveMatchEventService {
         user: IUserDocument
     ): Promise<MatchEventDocument> {
         try {
-            const date = new Date(dto.startTime * 1000);
+            let date = new Date(dto.startTime * 1000);
             /// compare date
             //            date.setMinutes(date.getMinutes() - 3);
 
+            // if start time is in past
+
+            const currentTime = new Date();
+            if (date < currentTime) {
+                // Start time is in the past
+                const currentTimePlus2Minutes = new Date(
+                    currentTime.getTime() + 2 * 60 * 1000
+                );
+                date = currentTimePlus2Minutes;
+            } else {
+            }
+            const matchEvent: MatchEventEntity = {
+                name: name,
+                matchId: dto.matchId,
+                events: dto.events.map((e) => new Types.ObjectId(e)),
+                applications: dto.applications.map(
+                    (e) => new Types.ObjectId(e)
+                ),
+                owner: user._id,
+                teamA: dto.teamA,
+                teamB: dto.teamB,
+                startTime: dto.startTime,
+                schedule: date,
+            };
+
+            for (let i = 0; i < dto.events.length; i++) {
+                const eventName: EventNameEntity =
+                    await this.eventNameService.findOneById(dto.events[i]);
+                if (
+                    eventName.name ===
+                    NotificationOptionEnum.timeInterval.toString()
+                ) {
+                    const currentTimePlus2Minutes = new Date(
+                        date.getTime() + parseInt(eventName.message) * 60 * 1000
+                    );
+                    matchEvent.scheduleForInterVal = currentTimePlus2Minutes;
+                }
+            }
+
             const create: MatchEventDocument =
-                new this.matchEventModel<MatchEventEntity>({
-                    name: name,
-                    matchId: dto.matchId,
-                    events: dto.events.map((e) => new Types.ObjectId(e)),
-                    applications: dto.applications.map(
-                        (e) => new Types.ObjectId(e)
-                    ),
-                    owner: user._id,
-                    teamA: dto.teamA,
-                    teamB: dto.teamB,
-                    startTime: dto.startTime,
-                    schedule: date,
-                });
+                new this.matchEventModel<MatchEventEntity>(matchEvent);
 
             await create.save();
             return create['_doc'];
@@ -139,6 +168,36 @@ export class LiveMatchEventService {
         //     },
         // };
 
+        const matchData: MatchEventDocument =
+            await this.findOneById<MatchEventDocument>(_id);
+        let date = new Date(matchData.startTime * 1000);
+
+        const currentTime = new Date();
+        if (date < currentTime) {
+            // Start time is in the past
+            const currentTimePlus2Minutes = new Date(
+                currentTime.getTime() + 2 * 60 * 1000
+            );
+            date = currentTimePlus2Minutes;
+        }
+
+        for (let i = 0; i < events.length; i++) {
+            const eventName: EventNameEntity =
+                await this.eventNameService.findOneById(events[i]);
+            if (
+                eventName.name ===
+                NotificationOptionEnum.timeInterval.toString()
+            ) {
+                const currentTimePlus2Minutes = new Date(
+                    date.getTime() + parseInt(eventName.message) * 60 * 1000
+                );
+
+                if (!matchData.scheduleForInterVal) {
+                    update['scheduleForInterVal'] = currentTimePlus2Minutes;
+                }
+            }
+        }
+
         await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>(
             { _id },
             update
@@ -152,6 +211,16 @@ export class LiveMatchEventService {
     async updateScheduleTme(_id: string, time: Date) {
         const update = {
             schedule: time,
+        };
+        await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>(
+            { _id },
+            update
+        );
+    }
+
+    async updateScheduleTmeFroInterval(_id: string, time: Date) {
+        const update = {
+            scheduleForInterVal: time,
         };
         await this.matchEventModel.findByIdAndUpdate<MatchEventDocument>(
             { _id },
@@ -256,7 +325,38 @@ export class LiveMatchEventService {
             }
 
             await notifier.notify();
+        } catch (e) {
+            console.log({ error: '[triggerEvents] error occurred' });
+            console.log({ e });
+        }
 
+        return;
+    }
+
+    async triggerIntervalEvents(match: MatchEventDocument) {
+        const dat: any[] = match.events;
+        const events: EventNameDocument[] = dat.map<EventNameDocument>(
+            (e) => e
+        );
+        try {
+            console.log(
+                'triggerIntervalEvents called with match id ' + match.matchId
+            );
+            const user = await this.userService.findOne<IUserDocument>({
+                email: 'admin@mail.com',
+            });
+            const matchUrl = `https://rest.entitysport.com/v2/matches/${match.matchId}/info?token=${user.apiToken}`;
+            const req = this.httpService.get(matchUrl);
+            const res = await req.toPromise();
+            const resData = res.data.response;
+
+            ///if match Abandoned, canceled, no result
+            if (resData.status == 4 || resData.status == 2) {
+                return this.deleteOne({ _id: match._id });
+            }
+
+            //time interval
+            let notifier: INotifyManager = new DefaultNotifyManager();
             if (
                 events
                     .map((e) => e.name)
@@ -271,7 +371,7 @@ export class LiveMatchEventService {
                 await notifier.notify();
             }
         } catch (e) {
-            console.log({ error: '[triggerEvents] error occurred' });
+            console.log({ error: '[triggerIntervalEvents] error occurred' });
             console.log({ e });
         }
 
